@@ -53,6 +53,8 @@
         .pass-input { text-align: center; font-size: 0.8rem; }
         
         .running-score { font-weight: bold; color: var(--success); font-size: 0.95rem; }
+        .summary-row { background-color: #0f172a; font-weight: bold; color: var(--accent); }
+        .final-row { background-color: #1e3a8a; font-weight: bold; color: #ffffff; font-size: 1rem; }
         
         button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1.05rem; }
         button:hover { opacity: 0.9; }
@@ -79,12 +81,21 @@
 
     <hr>
     
-    <!-- Spieltag Schnellauswahl -->
-    <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
-        <label style="color: var(--accent);">Spieltag Auswählen (Befüllt Datum & Gegner)</label>
-        <select id="scheduleSelect" onchange="applyScheduleSelection()">
-            <option value="">-- Spieltag wählen --</option>
-        </select>
+    <!-- Spielort & Spieltag Schnellauswahl -->
+    <div class="grid-2">
+        <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
+            <label style="color: var(--accent);">Heim / Auswärts</label>
+            <select id="matchType" onchange="toggleHomeAway()">
+                <option value="Heim">Heimspiel</option>
+                <option value="Auswärts">Auswärtsspiel</option>
+            </select>
+        </div>
+        <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
+            <label style="color: var(--accent);">Spieltag Auswählen</label>
+            <select id="scheduleSelect" onchange="applyScheduleSelection()">
+                <option value="">-- Spieltag wählen --</option>
+            </select>
+        </div>
     </div>
 
     <div class="grid-4">
@@ -95,10 +106,10 @@
     </div>
     
     <div class="grid-2">
-        <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 3"></div>
+        <div class="form-group"><label id="labelTeamHeim">Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 3"></div>
         <div class="form-group">
-            <label>Gastmannschaft</label>
-            <select id="teamGast" onchange="updateGastDropdowns()">
+            <label id="labelTeamGast">Gastmannschaft</label>
+            <select id="teamGast" onchange="updateDropdownRosters()">
                 <option value="">-- Gegner wählen --</option>
             </select>
         </div>
@@ -159,7 +170,7 @@
         "Triple Inn Issum 2": ["Lukas Helmes", "Sarah Hillejan", "Simon Hillejan", "Thomas Liebenow", "Marcel Angenendt", "Hans-Willi Hollick", "Joshua Jäschke", "Stefan Hanauer", "Michael Heinen", "Stefan Klein", "Christoph Passens", "Karl-Heinz Grimm", "Daniel Moschüring", "Michael Delbeck", "Sascha Rudies"]
     };
 
-    const singlePlayers = [
+    const myTeamRoster = [
         "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
     ];
 
@@ -197,6 +208,21 @@
         }
     }
 
+    function toggleHomeAway() {
+        const isAway = document.getElementById('matchType').value === "Auswärts";
+        const teamHeimInput = document.getElementById('teamHeim');
+        const opponentTeam = document.getElementById('teamGast').value;
+
+        if (isAway) {
+            teamHeimInput.value = opponentTeam || "Gegner";
+            document.getElementById('spielort').value = "Auswärts";
+        } else {
+            teamHeimInput.value = "TV Kapellen 3";
+            document.getElementById('spielort').value = "Vereinsheim";
+        }
+        updateDropdownRosters();
+    }
+
     function applyScheduleSelection() {
         const scheduleSelect = document.getElementById('scheduleSelect');
         const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
@@ -207,7 +233,7 @@
         document.getElementById('spieltag').value = selectedOption.dataset.spieltag;
         document.getElementById('teamGast').value = selectedOption.dataset.team;
 
-        updateGastDropdowns();
+        toggleHomeAway();
     }
 
     function buildTable() {
@@ -216,25 +242,14 @@
 
         for (let i = 1; i <= totalMatches; i++) {
             if (i === 1) addBlockHeader(tbody, "Block 1: Einzel (1 - 8)");
-            if (i === 9) addBlockHeader(tbody, "Block 2: Doppel (9 - 12)");
-            if (i === 13) addBlockHeader(tbody, "Block 3: Einzel (13 - 20)");
-
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><b>${i}</b></td>
                 <td><input type="text" class="pass-input" id="passHeim_${i}" placeholder="Pass"></td>
-                <td>
-                    <select id="pHeim_${i}">
-                        <option value="">-- Heim Spieler --</option>
-                        ${singlePlayers.map(p => `<option value="${p}">${p}</option>`).join('')}
-                    </select>
-                </td>
+                <td><select id="pHeim_${i}"><option value="">-- Spieler --</option></select></td>
                 <td><input type="text" class="pass-input" id="passGast_${i}" placeholder="Pass"></td>
-                <td>
-                    <select id="pGast_${i}">
-                        <option value="">-- Erst Gast wählen --</option>
-                    </select>
-                </td>
+                <td><select id="pGast_${i}"><option value="">-- Spieler --</option></select></td>
                 <td>
                     <div class="score-container">
                         <input type="number" class="score-input" id="lHeim_${i}" min="0" oninput="calculateScores()">
@@ -246,35 +261,64 @@
                 <td class="running-score" id="zsSpstd_${i}">-</td>
             `;
             tbody.appendChild(tr);
-        }
-    }
 
-    function updateGastDropdowns() {
-        const selectedGastTeam = document.getElementById('teamGast').value;
-        const roster = opponentRosters[selectedGastTeam] || [];
-
-        for (let i = 1; i <= totalMatches; i++) {
-            const selectEl = document.getElementById(`pGast_${i}`);
-            const currentValue = selectEl.value;
-
-            selectEl.innerHTML = '<option value="">-- Gast Spieler --</option>';
-            roster.forEach(player => {
-                const opt = document.createElement('option');
-                opt.value = player;
-                opt.textContent = player;
-                selectEl.appendChild(opt);
-            });
-
-            if (roster.includes(currentValue)) {
-                selectEl.value = currentValue;
+            // Zwischenstände & Endstand Zeilen
+            if (i === 8) {
+                addSummaryRow(tbody, "zwischenstand_block1", "Zwischenstand nach Einzel Block 1 (Spiele 1-8)");
+                addBlockHeader(tbody, "Block 2: Doppel (9 - 12)");
+            }
+            if (i === 12) {
+                addSummaryRow(tbody, "zwischenstand_block2", "Zwischenstand nach Doppel Block 2 (Spiele 1-12)");
+                addBlockHeader(tbody, "Block 3: Einzel (13 - 20)");
+            }
+            if (i === 20) {
+                addSummaryRow(tbody, "endstand_block3", "ENDSTAND (Spiele 1-20)", true);
             }
         }
+        updateDropdownRosters();
     }
 
     function addBlockHeader(tbody, text) {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td colspan="8" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
         tbody.appendChild(tr);
+    }
+
+    function addSummaryRow(tbody, idPrefix, title, isFinal = false) {
+        const tr = document.createElement('tr');
+        tr.className = isFinal ? "final-row" : "summary-row";
+        tr.innerHTML = `
+            <td colspan="5" style="text-align:right; padding-right:15px;">${title}:</td>
+            <td id="${idPrefix}_legs">-</td>
+            <td colspan="2" id="${idPrefix}_spiele">-</td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function updateDropdownRosters() {
+        const isAway = document.getElementById('matchType').value === "Auswärts";
+        const selectedOpponent = document.getElementById('teamGast').value;
+        const opponentRoster = opponentRosters[selectedOpponent] || [];
+
+        const heimRoster = isAway ? opponentRoster : myTeamRoster;
+        const gastRoster = isAway ? myTeamRoster : opponentRoster;
+
+        for (let i = 1; i <= totalMatches; i++) {
+            populateSelect(document.getElementById(`pHeim_${i}`), heimRoster);
+            populateSelect(document.getElementById(`pGast_${i}`), gastRoster);
+        }
+    }
+
+    function populateSelect(selectEl, roster) {
+        const currVal = selectEl.value;
+        selectEl.innerHTML = '<option value="">-- Spieler wählen --</option>';
+        roster.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            selectEl.appendChild(opt);
+        });
+        if (roster.includes(currVal)) selectEl.value = currVal;
     }
 
     function calculateScores() {
@@ -300,6 +344,20 @@
             } else {
                 document.getElementById(`zsLegs_${i}`).textContent = `-`;
                 document.getElementById(`zsSpstd_${i}`).textContent = `-`;
+            }
+
+            // Zwischenstände aktualisieren
+            if (i === 8) {
+                document.getElementById('zwischenstand_block1_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
+                document.getElementById('zwischenstand_block1_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
+            }
+            if (i === 12) {
+                document.getElementById('zwischenstand_block2_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
+                document.getElementById('zwischenstand_block2_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
+            }
+            if (i === 20) {
+                document.getElementById('endstand_block3_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
+                document.getElementById('endstand_block3_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
             }
         }
     }
@@ -343,7 +401,7 @@
         document.getElementById('teamHeim').value = report.heim || '';
         document.getElementById('teamGast').value = report.gast || '';
 
-        updateGastDropdowns();
+        updateDropdownRosters();
 
         if (report.matches && report.matches.length > 0) {
             report.matches.forEach((m, index) => {
@@ -369,12 +427,13 @@
     function resetForm() {
         document.getElementById('savedReportsSelect').value = '';
         document.getElementById('scheduleSelect').value = '';
+        document.getElementById('matchType').value = 'Heim';
         document.getElementById('datum').value = '';
         document.getElementById('spieltag').value = '1';
         document.getElementById('spielort').value = 'Vereinsheim';
         document.getElementById('teamGast').value = '';
 
-        updateGastDropdowns();
+        toggleHomeAway();
 
         for (let i = 1; i <= totalMatches; i++) {
             document.getElementById(`passHeim_${i}`).value = '';
@@ -420,8 +479,8 @@
                 heim: document.getElementById('teamHeim').value,
                 gast: document.getElementById('teamGast').value
             },
-            finalScore: document.getElementById(`zsSpstd_20`).textContent,
-            finalLegs: document.getElementById(`zsLegs_20`).textContent,
+            finalScore: document.getElementById('endstand_block3_spiele').textContent,
+            finalLegs: document.getElementById('endstand_block3_legs').textContent,
             bestleistungen: {
                 highscore: document.getElementById('blHighscore').value,
                 highfinish: document.getElementById('blHighfinish').value,
@@ -442,7 +501,6 @@
         });
     }
 
-    // Anwendung beim Aufrufen der Seite initialisieren
     initForm();
 </script>
 </body>
