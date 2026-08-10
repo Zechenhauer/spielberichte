@@ -65,15 +65,21 @@
         .block-header { background: #334155; color: #fff; text-align: left; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
 
-        /* Optimierung für den PDF-Export / Druck */
+        /* Optimierung für den PDF-Export / Druck (Erzwingt 1 DIN A4 Seite) */
+        @page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
         @media print {
-            .no-print, button, select, hr {
+            .no-print, button, hr {
                 display: none !important;
             }
             body {
                 background-color: #ffffff !important;
                 color: #000000 !important;
                 padding: 0 !important;
+                font-size: 10px !important;
             }
             .container {
                 background-color: #ffffff !important;
@@ -84,29 +90,48 @@
             }
             h2 {
                 color: #000000 !important;
+                font-size: 1.2rem !important;
+                margin-bottom: 5px !important;
+            }
+            .grid-2, .grid-4 {
+                gap: 5px !important;
+            }
+            .form-group {
+                margin-bottom: 4px !important;
             }
             label {
                 color: #333333 !important;
+                font-size: 0.65rem !important;
+                margin-bottom: 1px !important;
             }
-            input {
+            input, select {
                 background-color: #ffffff !important;
                 color: #000000 !important;
                 border: none !important;
                 border-bottom: 1px solid #000 !important;
                 border-radius: 0 !important;
+                padding: 2px !important;
+                font-size: 0.8rem !important;
+                height: auto !important;
+            }
+            table {
+                margin-top: 6px !important;
+                font-size: 0.75rem !important;
+            }
+            th, td {
+                border: 1px solid #000 !important;
+                padding: 2px 1px !important;
+                color: #000000 !important;
             }
             th {
                 background-color: #f1f5f9 !important;
-                color: #000000 !important;
-                border: 1px solid #000 !important;
-            }
-            td {
-                border: 1px solid #000 !important;
-                color: #000000 !important;
             }
             .block-header {
                 background-color: #e2e8f0 !important;
                 color: #000000 !important;
+                padding: 3px 6px !important;
+                margin-top: 6px !important;
+                font-size: 0.8rem !important;
             }
             .summary-row, .final-row {
                 background-color: #f1f5f9 !important;
@@ -114,6 +139,18 @@
             }
             .running-score {
                 color: #000000 !important;
+            }
+            .score-input {
+                border: none !important;
+                width: 25px !important;
+            }
+            /* Druckspezifische Klasse zur Darstellung von Select-Werten */
+            .print-val {
+                display: block !important;
+                font-weight: bold;
+            }
+            select.is-printed {
+                display: none !important;
             }
         }
     </style>
@@ -132,7 +169,7 @@
             </select>
             <button class="btn-blue" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="resetForm()">Neuer Bericht</button>
             <button class="btn-danger" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="deleteReport()">Löschen</button>
-            <button class="btn-secondary" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="window.print()">Als PDF speichern / Drucken</button>
+            <button class="btn-secondary" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="triggerPrint()">Als PDF speichern / Drucken</button>
         </div>
     </div>
 
@@ -175,21 +212,21 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 30px;">#</th>
-                <th style="width: 90px;">Pass Heim</th>
-                <th style="width: 200px;">Heim Spieler</th>
-                <th style="width: 90px;">Pass Gast</th>
-                <th style="width: 200px;">Gast Spieler</th>
-                <th style="width: 110px;">Legs</th>
-                <th style="width: 90px;">Zw. Legs</th>
-                <th style="width: 90px;">Zw. Spiele</th>
+                <th style="width: 25px;">#</th>
+                <th style="width: 75px;">Pass Heim</th>
+                <th>Heim Spieler</th>
+                <th style="width: 75px;">Pass Gast</th>
+                <th>Gast Spieler</th>
+                <th style="width: 90px;">Legs</th>
+                <th style="width: 75px;">Zw. Legs</th>
+                <th style="width: 75px;">Zw. Spiele</th>
             </tr>
         </thead>
         <tbody id="matchTableBody"></tbody>
     </table>
 
     <div class="block-header">Bestleistungen</div>
-    <div class="grid-2" style="margin-top: 10px;">
+    <div class="grid-2" style="margin-top: 6px;">
         <div class="form-group"><label>Highscore (180)</label><input type="text" id="blHighscore" placeholder="Spieler Name(n)"></div>
         <div class="form-group"><label>Highfinish (100+)</label><input type="text" id="blHighfinish" placeholder="z.B. 120 (Max)"></div>
         <div class="form-group"><label>Shortgame Einzel</label><input type="text" id="blShortEinzel" placeholder="z.B. 15 Darts"></div>
@@ -239,6 +276,27 @@
         populateGastTeamsSelect();
         buildTable();
         loadReportsFromSheet();
+    }
+
+    function triggerPrint() {
+        // Wandelt alle Select-Felder temporär in Spans um, damit der Wert im Druck erscheint
+        const selects = document.querySelectorAll('select:not(.no-print)');
+        selects.forEach(sel => {
+            const selectedText = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+            if (selectedText && !selectedText.startsWith('--')) {
+                const printSpan = document.createElement('span');
+                printSpan.className = 'print-val';
+                printSpan.textContent = selectedText;
+                sel.parentNode.appendChild(printSpan);
+                sel.classList.add('is-printed');
+            }
+        });
+
+        window.print();
+
+        // Bereinigung nach dem Drucken
+        document.querySelectorAll('.print-val').forEach(el => el.remove());
+        document.querySelectorAll('select.is-printed').forEach(el => el.classList.remove('is-printed'));
     }
 
     function populateScheduleSelect() {
@@ -467,7 +525,8 @@
                     const option = document.createElement('option');
                     option.value = index;
                     const d = report.datum ? report.datum.substring(0, 10) : 'Kein Datum';
-                    option.textContent = `Spieltag ${report.spieltag} (${d}): ${report.heim} vs. ${report.gast} (${report.endstandSpiele})`;
+                    const score = report.endstandSpiele || '-:-';
+                    option.textContent = `Spieltag ${report.spieltag} (${d}): ${report.heim} vs. ${report.gast} (${score})`;
                     selectEl.appendChild(option);
                 });
             } else {
