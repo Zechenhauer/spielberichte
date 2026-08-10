@@ -68,7 +68,7 @@
         /* Optimierung für den PDF-Export / Druck (Erzwingt 1 DIN A4 Seite) */
         @page {
             size: A4 portrait;
-            margin: 8mm;
+            margin: 6mm;
         }
 
         @media print {
@@ -90,18 +90,18 @@
             }
             h2 {
                 color: #000000 !important;
-                font-size: 1.2rem !important;
-                margin-bottom: 5px !important;
+                font-size: 1.1rem !important;
+                margin-bottom: 4px !important;
             }
             .grid-2, .grid-4 {
-                gap: 5px !important;
+                gap: 4px !important;
             }
             .form-group {
-                margin-bottom: 4px !important;
+                margin-bottom: 3px !important;
             }
             label {
                 color: #333333 !important;
-                font-size: 0.65rem !important;
+                font-size: 0.6rem !important;
                 margin-bottom: 1px !important;
             }
             input, select {
@@ -110,17 +110,31 @@
                 border: none !important;
                 border-bottom: 1px solid #000 !important;
                 border-radius: 0 !important;
-                padding: 2px !important;
-                font-size: 0.8rem !important;
-                height: auto !important;
-            }
-            table {
-                margin-top: 6px !important;
+                padding: 1px 2px !important;
                 font-size: 0.75rem !important;
+                height: auto !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+            }
+
+            /* Spinner-Pfeile bei den Leg-Inputs im Druck ausblenden */
+            input[type=number]::-webkit-inner-spin-button, 
+            input[type=number]::-webkit-outer-spin-button { 
+                -webkit-appearance: none !important; 
+                margin: 0 !important; 
+            }
+            input[type=number] {
+                -moz-appearance: textfield !important;
+            }
+
+            table {
+                margin-top: 4px !important;
+                font-size: 0.72rem !important;
             }
             th, td {
                 border: 1px solid #000 !important;
-                padding: 2px 1px !important;
+                padding: 1px 1px !important;
                 color: #000000 !important;
             }
             th {
@@ -129,9 +143,9 @@
             .block-header {
                 background-color: #e2e8f0 !important;
                 color: #000000 !important;
-                padding: 3px 6px !important;
-                margin-top: 6px !important;
-                font-size: 0.8rem !important;
+                padding: 2px 4px !important;
+                margin-top: 4px !important;
+                font-size: 0.75rem !important;
             }
             .summary-row, .final-row {
                 background-color: #f1f5f9 !important;
@@ -142,12 +156,16 @@
             }
             .score-input {
                 border: none !important;
-                width: 25px !important;
+                width: 30px !important;
+                text-align: center !important;
+                font-weight: bold !important;
             }
-            /* Druckspezifische Klasse zur Darstellung von Select-Werten */
+
+            /* Ausgewählte Werte aus Dropdowns beim Druck als reinen Text anzeigen */
             .print-val {
                 display: block !important;
                 font-weight: bold;
+                font-size: 0.75rem;
             }
             select.is-printed {
                 display: none !important;
@@ -217,7 +235,7 @@
                 <th>Heim Spieler</th>
                 <th style="width: 75px;">Pass Gast</th>
                 <th>Gast Spieler</th>
-                <th style="width: 90px;">Legs</th>
+                <th style="width: 85px;">Legs</th>
                 <th style="width: 75px;">Zw. Legs</th>
                 <th style="width: 75px;">Zw. Spiele</th>
             </tr>
@@ -279,7 +297,7 @@
     }
 
     function triggerPrint() {
-        // Wandelt alle Select-Felder temporär in Spans um, damit der Wert im Druck erscheint
+        // Wandelt ausgewählte Dropdown-Optionen vor dem Drucken temporär in Lesetext um
         const selects = document.querySelectorAll('select:not(.no-print)');
         selects.forEach(sel => {
             const selectedText = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
@@ -294,7 +312,7 @@
 
         window.print();
 
-        // Bereinigung nach dem Drucken
+        // Stellt den Normalzustand wieder her
         document.querySelectorAll('.print-val').forEach(el => el.remove());
         document.querySelectorAll('select.is-printed').forEach(el => el.classList.remove('is-printed'));
     }
@@ -525,7 +543,7 @@
                     const option = document.createElement('option');
                     option.value = index;
                     const d = report.datum ? report.datum.substring(0, 10) : 'Kein Datum';
-                    const score = report.endstandSpiele || '-:-';
+                    const score = (report.endstandSpiele && report.endstandSpiele !== 'undefined') ? report.endstandSpiele : '-:-';
                     option.textContent = `Spieltag ${report.spieltag} (${d}): ${report.heim} vs. ${report.gast} (${score})`;
                     selectEl.appendChild(option);
                 });
