@@ -13,6 +13,7 @@
             --text-muted: #94a3b8;
             --accent: #3b82f6;
             --success: #22c55e;
+            --danger: #ef4444;
         }
 
         body {
@@ -59,6 +60,7 @@
         button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1.05rem; }
         button:hover { opacity: 0.9; }
         .btn-blue { background: var(--accent); }
+        .btn-danger { background: var(--danger); }
         .block-header { background: #334155; color: #fff; text-align: left; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
     </style>
@@ -68,14 +70,15 @@
 <div class="container">
     <h2>NWDV Ligaspielbericht "Typ A" - TV Kapellen 1919 e.V. 3</h2>
 
-    <!-- Archiv / Laden-Sektion -->
+    <!-- Archiv / Laden & Löschen Sektion -->
     <div class="form-group" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-        <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen</label>
-        <div style="display:flex; gap: 12px;">
-            <select id="savedReportsSelect" onchange="loadSelectedReport()">
+        <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen / verwalten</label>
+        <div style="display:flex; gap: 12px; align-items: center;">
+            <select id="savedReportsSelect" onchange="loadSelectedReport()" style="flex: 1;">
                 <option value="">Lade gespeicherte Berichte...</option>
             </select>
             <button class="btn-blue" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="resetForm()">Neuer Bericht</button>
+            <button class="btn-danger" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="deleteReport()">Löschen</button>
         </div>
     </div>
 
@@ -533,6 +536,41 @@
         }).then(() => {
             alert("NWDV-Spielbericht erfolgreich übermittelt!");
             setTimeout(loadReportsFromSheet, 1500);
+        });
+    }
+
+    function deleteReport() {
+        const selectEl = document.getElementById('savedReportsSelect');
+        const idx = selectEl.value;
+
+        if (idx === "") {
+            alert("Bitte wähle zuerst einen Spielbericht aus, den du löschen möchtest.");
+            return;
+        }
+
+        const report = allReports[idx];
+        const confirmDelete = confirm(`Möchtest du den Spielbericht wirklich löschen?\n\nSpieltag ${report.spieltag}: ${report.heim} vs. ${report.gast}`);
+
+        if (!confirmDelete) return;
+
+        const payload = {
+            sheetName: SHEET_NAME,
+            action: "deleteNwdvReport",
+            rowIndex: parseInt(idx, 10)
+        };
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            alert("Spielbericht erfolgreich gelöscht!");
+            resetForm();
+            setTimeout(loadReportsFromSheet, 1500);
+        }).catch(err => {
+            console.error("Fehler beim Löschen:", err);
+            alert("Fehler beim Löschen des Berichts.");
         });
     }
 
