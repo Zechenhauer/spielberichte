@@ -50,13 +50,28 @@
         
         button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1rem; }
         button:hover { opacity: 0.9; }
+        .btn-blue { background: var(--accent); }
         .block-header { background: #334155; color: #fff; text-align: left; padding: 6px 10px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>NWDV Ligaspielbericht "Typ A"</h2>
+
+    <!-- Archiv / Laden-Sektion -->
+    <div class="form-group" style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen</label>
+        <div style="display:flex; gap: 10px;">
+            <select id="savedReportsSelect" onchange="loadSelectedReport()">
+                <option value="">Lade gespeicherte Berichte...</option>
+            </select>
+            <button class="btn-blue" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="resetForm()">Neuer Bericht</button>
+        </div>
+    </div>
+
+    <hr>
     
     <div class="grid-4">
         <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
@@ -98,6 +113,7 @@
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmQzZgiasZFG-nb0TpnzRrqR5dm13fuPqsXJIf4IYfk4zIdrBCme6tI8axB-stUfM/exec";
     const totalMatches = 20;
+    let allReports = [];
 
     function buildTable() {
         const tbody = document.getElementById('matchTableBody');
@@ -162,6 +178,91 @@
         }
     }
 
+    async function loadReportsFromSheet() {
+        const selectEl = document.getElementById('savedReportsSelect');
+        try {
+            const res = await fetch(WEB_APP_URL);
+            allReports = await res.json();
+
+            selectEl.innerHTML = '<option value="">-- Spielbericht auswählen zum Ansehen --</option>';
+
+            if (allReports && allReports.length > 0) {
+                allReports.forEach((report, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    const d = report.datum ? report.datum.substring(0, 10) : 'Kein Datum';
+                    option.textContent = `Spieltag ${report.spieltag} (${d}): ${report.heim} vs. ${report.gast} (${report.endstandSpiele})`;
+                    selectEl.appendChild(option);
+                });
+            } else {
+                selectEl.innerHTML = '<option value="">Keine gespeicherten Berichte vorhanden</option>';
+            }
+        } catch (e) {
+            console.error("Fehler beim Laden:", e);
+            selectEl.innerHTML = '<option value="">Fehler beim Laden der Berichte</option>';
+        }
+    }
+
+    function loadSelectedReport() {
+        const selectEl = document.getElementById('savedReportsSelect');
+        const idx = selectEl.value;
+
+        if (idx === "") return;
+
+        const report = allReports[idx];
+        if (!report) return;
+
+        // Kopfdaten füllen
+        if (report.datum) document.getElementById('datum').value = report.datum.substring(0, 10);
+        document.getElementById('spieltag').value = report.spieltag || 1;
+        document.getElementById('liga').value = report.liga || '';
+        document.getElementById('spielort').value = report.spielort || '';
+        document.getElementById('teamHeim').value = report.heim || '';
+        document.getElementById('teamGast').value = report.gast || '';
+
+        // Matches füllen
+        if (report.matches && report.matches.length > 0) {
+            report.matches.forEach((m, index) => {
+                const i = index + 1;
+                document.getElementById(`pHeim_${i}`).value = m.pHeim || '';
+                document.getElementById(`pGast_${i}`).value = m.pGast || '';
+                document.getElementById(`lHeim_${i}`).value = m.lHeim || '';
+                document.getElementById(`lGast_${i}`).value = m.lGast || '';
+            });
+            calculateScores();
+        }
+
+        // Bestleistungen füllen
+        if (report.bestleistungen) {
+            document.getElementById('blHighscore').value = report.bestleistungen.highscore || '';
+            document.getElementById('blHighfinish').value = report.bestleistungen.highfinish || '';
+            document.getElementById('blShortEinzel').value = report.bestleistungen.shortEinzel || '';
+            document.getElementById('blShortDoppel').value = report.bestleistungen.shortDoppel || '';
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('savedReportsSelect').value = '';
+        document.getElementById('datum').value = '';
+        document.getElementById('spieltag').value = '1';
+        document.getElementById('spielort').value = '';
+        document.getElementById('teamGast').value = '';
+
+        for (let i = 1; i <= totalMatches; i++) {
+            document.getElementById(`pHeim_${i}`).value = '';
+            document.getElementById(`pGast_${i}`).value = '';
+            document.getElementById(`lHeim_${i}`).value = '';
+            document.getElementById(`lGast_${i}`).value = '';
+        }
+
+        document.getElementById('blHighscore').value = '';
+        document.getElementById('blHighfinish').value = '';
+        document.getElementById('blShortEinzel').value = '';
+        document.getElementById('blShortDoppel').value = '';
+
+        calculateScores();
+    }
+
     function saveReport() {
         let matches = [];
         for (let i = 1; i <= totalMatches; i++) {
@@ -203,11 +304,13 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         }).then(() => {
-            alert("NWDV-Spielbericht erfolgreich in das neue Sheet übertragen!");
+            alert("NWDV-Spielbericht erfolgreich in das Sheet übertragen!");
+            setTimeout(loadReportsFromSheet, 1500);
         });
     }
 
     buildTable();
+    loadReportsFromSheet();
 </script>
 </body>
 </html>
