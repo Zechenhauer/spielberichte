@@ -213,14 +213,15 @@
         const isAway = document.getElementById('matchType').value === "Auswärts";
         const scheduleSelect = document.getElementById('scheduleSelect');
         const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
+        
         const selectedOpponent = selectedOption?.dataset?.team || document.getElementById('teamGast').value;
+        const ownTeam = "TV Kapellen 1919 e.V. 3";
 
         const teamHeimInput = document.getElementById('teamHeim');
         const teamGastSelect = document.getElementById('teamGast');
-        const ownTeam = "TV Kapellen 1919 e.V. 3";
 
         if (isAway) {
-            teamHeimInput.value = (selectedOpponent && selectedOpponent !== ownTeam) ? selectedOpponent : "Gegner";
+            teamHeimInput.value = (selectedOpponent && selectedOpponent !== ownTeam) ? selectedOpponent : "Gegner wählen";
             
             if (!Array.from(teamGastSelect.options).some(opt => opt.value === ownTeam)) {
                 const opt = document.createElement('option');
@@ -232,6 +233,7 @@
             document.getElementById('spielort').value = "Auswärts";
         } else {
             teamHeimInput.value = ownTeam;
+            
             populateGastTeamsSelect();
             if (selectedOpponent && selectedOpponent !== ownTeam) {
                 teamGastSelect.value = selectedOpponent;
@@ -250,7 +252,15 @@
 
         document.getElementById('datum').value = selectedOption.value;
         document.getElementById('spieltag').value = selectedOption.dataset.spieltag;
-        document.getElementById('teamGast').value = selectedOption.dataset.team;
+        
+        const opponent = selectedOption.dataset.team;
+        const isAway = document.getElementById('matchType').value === "Auswärts";
+
+        if (isAway) {
+            document.getElementById('teamHeim').value = opponent;
+        } else {
+            document.getElementById('teamGast').value = opponent;
+        }
 
         toggleHomeAway();
     }
@@ -315,8 +325,15 @@
 
     function updateDropdownRosters() {
         const isAway = document.getElementById('matchType').value === "Auswärts";
-        const selectedGast = document.getElementById('teamGast').value;
-        const opponentRoster = opponentRosters[selectedGast] || [];
+        let opponentName = "";
+
+        if (isAway) {
+            opponentName = document.getElementById('teamHeim').value;
+        } else {
+            opponentName = document.getElementById('teamGast').value;
+        }
+
+        const opponentRoster = opponentRosters[opponentName] || [];
 
         const heimRoster = isAway ? opponentRoster : myTeamRoster;
         const gastRoster = isAway ? myTeamRoster : opponentRoster;
