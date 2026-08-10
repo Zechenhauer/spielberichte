@@ -61,8 +61,61 @@
         button:hover { opacity: 0.9; }
         .btn-blue { background: var(--accent); }
         .btn-danger { background: var(--danger); }
+        .btn-secondary { background: #475569; }
         .block-header { background: #334155; color: #fff; text-align: left; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
+
+        /* Optimierung für den PDF-Export / Druck */
+        @media print {
+            .no-print, button, select, hr {
+                display: none !important;
+            }
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .container {
+                background-color: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            h2 {
+                color: #000000 !important;
+            }
+            label {
+                color: #333333 !important;
+            }
+            input {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+                border-bottom: 1px solid #000 !important;
+                border-radius: 0 !important;
+            }
+            th {
+                background-color: #f1f5f9 !important;
+                color: #000000 !important;
+                border: 1px solid #000 !important;
+            }
+            td {
+                border: 1px solid #000 !important;
+                color: #000000 !important;
+            }
+            .block-header {
+                background-color: #e2e8f0 !important;
+                color: #000000 !important;
+            }
+            .summary-row, .final-row {
+                background-color: #f1f5f9 !important;
+                color: #000000 !important;
+            }
+            .running-score {
+                color: #000000 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -71,18 +124,19 @@
     <h2>NWDV Ligaspielbericht "Typ A" - TV Kapellen 1919 e.V. 3</h2>
 
     <!-- Archiv / Laden & Löschen Sektion -->
-    <div class="form-group" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+    <div class="form-group no-print" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
         <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen / verwalten</label>
-        <div style="display:flex; gap: 12px; align-items: center;">
-            <select id="savedReportsSelect" onchange="loadSelectedReport()" style="flex: 1;">
+        <div style="display:flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <select id="savedReportsSelect" onchange="loadSelectedReport()" style="flex: 1; min-width: 200px;">
                 <option value="">Lade gespeicherte Berichte...</option>
             </select>
             <button class="btn-blue" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="resetForm()">Neuer Bericht</button>
             <button class="btn-danger" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="deleteReport()">Löschen</button>
+            <button class="btn-secondary" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="window.print()">Als PDF speichern / Drucken</button>
         </div>
     </div>
 
-    <hr>
+    <hr class="no-print">
     
     <!-- Heim/Auswärts & Spieltag Auswahl -->
     <div class="grid-2">
@@ -142,7 +196,7 @@
         <div class="form-group"><label>Shortgame Doppel</label><input type="text" id="blShortDoppel" placeholder="z.B. 18 Darts"></div>
     </div>
 
-    <button onclick="saveReport()">Spielbericht Speichern</button>
+    <button class="no-print" onclick="saveReport()">Spielbericht Speichern</button>
 </div>
 
 <script>
@@ -311,7 +365,7 @@
 
     function addBlockHeader(tbody, text) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="8" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
+        tr.innerHTML = `<td colspan="8" class="block-header" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
         tbody.appendChild(tr);
     }
 
