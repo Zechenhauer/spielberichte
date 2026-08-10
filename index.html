@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NWDV Spielbericht Typ A</title>
+    <title>NWDV Spielbericht Typ A - TV Kapellen 3</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -31,7 +31,7 @@
             border-radius: 12px;
             padding: 25px;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
@@ -41,17 +41,16 @@
         
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-        input, select { width: 100%; padding: 8px 10px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: white; box-sizing: border-box; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 8px 10px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: white; box-sizing: border-box; font-size: 0.9rem; }
         input:focus, select:focus { outline: 1px solid var(--accent); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; table-layout: fixed; }
-        th, td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; table-layout: fixed; }
+        th, td { border: 1px solid var(--border-color); padding: 6px 4px; text-align: center; }
         th { background: #0f172a; color: var(--accent); white-space: nowrap; }
         
-        /* Desktop-Größen für Eingaben */
-        .score-container { display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .score-input { width: 45px !important; padding: 5px; text-align: center; font-weight: bold; font-size: 1rem; }
-        .pass-input { text-align: center; font-size: 0.85rem; }
+        .score-container { display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .score-input { width: 42px !important; padding: 4px; text-align: center; font-weight: bold; font-size: 0.95rem; }
+        .pass-input { text-align: center; font-size: 0.8rem; }
         
         .running-score { font-weight: bold; color: var(--success); font-size: 0.95rem; }
         
@@ -65,7 +64,7 @@
 <body>
 
 <div class="container">
-    <h2>NWDV Ligaspielbericht "Typ A"</h2>
+    <h2>NWDV Ligaspielbericht "Typ A" - TV Kapellen 3</h2>
 
     <!-- Archiv / Laden-Sektion -->
     <div class="form-group" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -80,29 +79,42 @@
 
     <hr>
     
+    <!-- Spieltag Schnellauswahl -->
+    <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
+        <label style="color: var(--accent);">Spieltag Auswählen (Befüllt Datum & Gegner)</label>
+        <select id="scheduleSelect" onchange="applyScheduleSelection()">
+            <option value="">-- Spieltag wählen --</option>
+        </select>
+    </div>
+
     <div class="grid-4">
         <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
         <div class="form-group"><label>Spieltag</label><input type="number" id="spieltag" value="1"></div>
         <div class="form-group"><label>Liga</label><input type="text" id="liga" value="NWDV Liga A"></div>
-        <div class="form-group"><label>Spielort</label><input type="text" id="spielort" placeholder="Vereinsheim"></div>
+        <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Vereinsheim"></div>
     </div>
     
     <div class="grid-2">
-        <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen"></div>
-        <div class="form-group"><label>Gastmannschaft</label><input type="text" id="teamGast" placeholder="Gegner Name"></div>
+        <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 3"></div>
+        <div class="form-group">
+            <label>Gastmannschaft</label>
+            <select id="teamGast" onchange="updateGastDropdowns()">
+                <option value="">-- Gegner wählen --</option>
+            </select>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 35px;">#</th>
-                <th style="width: 100px;">Pass Heim</th>
-                <th>Heim Spieler</th>
-                <th style="width: 100px;">Pass Gast</th>
-                <th>Gast Spieler</th>
-                <th style="width: 130px;">Legs</th>
-                <th style="width: 110px;">Zw. Stand (Legs)</th>
-                <th style="width: 110px;">Zw. Stand (Spstd.)</th>
+                <th style="width: 30px;">#</th>
+                <th style="width: 90px;">Pass Heim</th>
+                <th style="width: 200px;">Heim Spieler</th>
+                <th style="width: 90px;">Pass Gast</th>
+                <th style="width: 200px;">Gast Spieler</th>
+                <th style="width: 110px;">Legs</th>
+                <th style="width: 90px;">Zw. Legs</th>
+                <th style="width: 90px;">Zw. Spiele</th>
             </tr>
         </thead>
         <tbody id="matchTableBody"></tbody>
@@ -120,9 +132,83 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmQzZgiasZFG-nb0TpnzRrqR5dm13fuPqsXJIf4IYfk4zIdrBCme6tI8axB-stUfM/exec";
+    const SHEET_NAME = "TV Kapellen 3"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzueR2jiTn74LbqOzWqAHrregerQnnjjuAfJsMQTty2KHj1i4oIdrz1xu4ewXRgj_cGHA/exec";
+
+    const schedule = {
+        "2026-09-05": "DSC Goch 3",
+        "2026-09-19": "DSC Goch 4",
+        "2026-09-26": "Die Wardter Darter",
+        "2026-10-10": "Hart am Draht",
+        "2026-10-24": "Rumelner TV 3",
+        "2026-11-07": "SV Menzelen 1925",
+        "2026-11-14": "TV Kapellen 1919 e.V. 2",
+        "2026-11-28": "The Red Lions Xanten 1",
+        "2027-01-09": "Triple Inn Issum 2"
+    };
+
+    const opponentRosters = {
+        "DSC Goch 3": ["Lucas Keisers", "Patryk Tajdus", "Juri Lambert", "Jannik Lommen", "Manfred Michels", "Xavier Tomalla", "Björn Janssen", "Antoni Rolniczak", "Jonas Neiling", "Tim Knops", "Sven Stiebing", "Lennart Upmeyer", "Lukas Kerst", "Sebastian Wouters", "Linus Kerst", "Michael Loock"],
+        "DSC Goch 4": ["Jens Robert Michels", "Ben Schweidler", "Patrick Thellmann", "Andreas Geurtsen", "Alexander Schmidt", "Mario van Elst", "Melanie Zwanziger", "Kevin van Elst", "Tobias Klamp", "Hans Günther Seidl", "Marco Hofkens", "Maximilian Henn", "Jörg Hillmann", "Michael Schweidler", "Hans-Jürgen Otto", "Adrian Hoppe", "Justus Kilzer", "Holger Stayen", "Niklas Krämer"],
+        "Die Wardter Darter": ["Alexander Reis", "Narayan Amanupunnjo", "Marvin Loth", "Ralf Graumann", "Christian Dederle", "Daniel Venhoff", "Marius Bußmann", "Rainer Staymann", "Martin Wegner", "Timo von Scheidt", "André Kaufels"],
+        "Hart am Draht": ["Ann-Kathrin Brugmann", "Justin Schraven", "Leandro Wessiepe", "Pierre Lohmann", "Marius Hergesell", "Kevin Haßheider", "Henning Felder", "Annkathrin Wanders", "Saskia Husmann", "Benjamin Borgards", "Philipp-Sascha Brugmann", "Stefan Borgards", "Marco Inghilleri", "Melanie Bendriss", "Manuela Weis", "Robin Weis", "Michael Ganther", "Thomas Zygar"],
+        "Rumelner TV 3": ["Michaela von Dahlen", "Christian Krause", "Stefan Eilbrecht", "Sebastian Pohl", "Pierre von Dahlen", "Marvin Fünfstück", "Valentin De Spirt", "Alexander Wahl", "Melanie Drees", "Mike Küffen", "Sam von Dahlen", "Sascha Schütte"],
+        "SV Menzelen 1925": ["Iris Reimer", "Julian Keisers", "Erich Janik", "Martin Haberstroh", "Johannes Wynen", "Thomas Kiwitt", "Robert Giesen", "Christoph Luschgy", "Tanja Wynen", "Sven Krams", "Stephan Kempkes", "Daniel Kempkes", "Markus Reimer"],
+        "TV Kapellen 1919 e.V. 2": ["Philip Möller", "Markus Thiele", "Danny Voß", "Daniel Simanowitz", "Christian Schreiber", "Dominik Herz", "Markus Elgersma", "Thomas Franzen"],
+        "The Red Lions Xanten 1": ["Sebastian ALosery", "Jan Pötters", "Stephan Reintges", "Raphael Wefers", "Kai Maas", "Dustin Stenzel", "Tobias Reintges", "Björn Hesse"],
+        "Triple Inn Issum 2": ["Lukas Helmes", "Sarah Hillejan", "Simon Hillejan", "Thomas Liebenow", "Marcel Angenendt", "Hans-Willi Hollick", "Joshua Jäschke", "Stefan Hanauer", "Michael Heinen", "Stefan Klein", "Christoph Passens", "Karl-Heinz Grimm", "Daniel Moschüring", "Michael Delbeck", "Sascha Rudies"]
+    };
+
+    const singlePlayers = [
+        "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
+    ];
+
     const totalMatches = 20;
     let allReports = [];
+
+    function initForm() {
+        populateScheduleSelect();
+        populateGastTeamsSelect();
+        buildTable();
+        loadReportsFromSheet();
+    }
+
+    function populateScheduleSelect() {
+        const scheduleSelect = document.getElementById('scheduleSelect');
+        let index = 1;
+        for (const [date, team] of Object.entries(schedule)) {
+            const option = document.createElement('option');
+            option.value = date;
+            option.dataset.spieltag = index;
+            option.dataset.team = team;
+            option.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
+            scheduleSelect.appendChild(option);
+            index++;
+        }
+    }
+
+    function populateGastTeamsSelect() {
+        const teamGastSelect = document.getElementById('teamGast');
+        for (const team of Object.keys(opponentRosters)) {
+            const option = document.createElement('option');
+            option.value = team;
+            option.textContent = team;
+            teamGastSelect.appendChild(option);
+        }
+    }
+
+    function applyScheduleSelection() {
+        const scheduleSelect = document.getElementById('scheduleSelect');
+        const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
+        
+        if (!selectedOption.value) return;
+
+        document.getElementById('datum').value = selectedOption.value;
+        document.getElementById('spieltag').value = selectedOption.dataset.spieltag;
+        document.getElementById('teamGast').value = selectedOption.dataset.team;
+
+        updateGastDropdowns();
+    }
 
     function buildTable() {
         const tbody = document.getElementById('matchTableBody');
@@ -136,10 +222,19 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><b>${i}</b></td>
-                <td><input type="text" class="pass-input" id="passHeim_${i}" placeholder="Pass-Nr."></td>
-                <td><input type="text" id="pHeim_${i}" placeholder="Spieler Heim"></td>
-                <td><input type="text" class="pass-input" id="passGast_${i}" placeholder="Pass-Nr."></td>
-                <td><input type="text" id="pGast_${i}" placeholder="Spieler Gast"></td>
+                <td><input type="text" class="pass-input" id="passHeim_${i}" placeholder="Pass"></td>
+                <td>
+                    <select id="pHeim_${i}">
+                        <option value="">-- Heim Spieler --</option>
+                        ${singlePlayers.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    </select>
+                </td>
+                <td><input type="text" class="pass-input" id="passGast_${i}" placeholder="Pass"></td>
+                <td>
+                    <select id="pGast_${i}">
+                        <option value="">-- Erst Gast wählen --</option>
+                    </select>
+                </td>
                 <td>
                     <div class="score-container">
                         <input type="number" class="score-input" id="lHeim_${i}" min="0" oninput="calculateScores()">
@@ -154,6 +249,28 @@
         }
     }
 
+    function updateGastDropdowns() {
+        const selectedGastTeam = document.getElementById('teamGast').value;
+        const roster = opponentRosters[selectedGastTeam] || [];
+
+        for (let i = 1; i <= totalMatches; i++) {
+            const selectEl = document.getElementById(`pGast_${i}`);
+            const currentValue = selectEl.value;
+
+            selectEl.innerHTML = '<option value="">-- Gast Spieler --</option>';
+            roster.forEach(player => {
+                const opt = document.createElement('option');
+                opt.value = player;
+                opt.textContent = player;
+                selectEl.appendChild(opt);
+            });
+
+            if (roster.includes(currentValue)) {
+                selectEl.value = currentValue;
+            }
+        }
+    }
+
     function addBlockHeader(tbody, text) {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td colspan="8" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
@@ -161,10 +278,8 @@
     }
 
     function calculateScores() {
-        let cumHeimLegs = 0;
-        let cumGastLegs = 0;
-        let cumHeimGames = 0;
-        let cumGastGames = 0;
+        let cumHeimLegs = 0, cumGastLegs = 0;
+        let cumHeimGames = 0, cumGastGames = 0;
 
         for (let i = 1; i <= totalMatches; i++) {
             const hLegsVal = document.getElementById(`lHeim_${i}`).value;
@@ -177,11 +292,8 @@
                 cumHeimLegs += hLegs;
                 cumGastLegs += gLegs;
 
-                if (hLegs > gLegs) {
-                    cumHeimGames += 1;
-                } else if (gLegs > hLegs) {
-                    cumGastGames += 1;
-                }
+                if (hLegs > gLegs) cumHeimGames += 1;
+                else if (gLegs > hLegs) cumGastGames += 1;
 
                 document.getElementById(`zsLegs_${i}`).textContent = `${cumHeimLegs} : ${cumGastLegs}`;
                 document.getElementById(`zsSpstd_${i}`).textContent = `${cumHeimGames} : ${cumGastGames}`;
@@ -218,9 +330,7 @@
     }
 
     function loadSelectedReport() {
-        const selectEl = document.getElementById('savedReportsSelect');
-        const idx = selectEl.value;
-
+        const idx = document.getElementById('savedReportsSelect').value;
         if (idx === "") return;
 
         const report = allReports[idx];
@@ -232,6 +342,8 @@
         document.getElementById('spielort').value = report.spielort || '';
         document.getElementById('teamHeim').value = report.heim || '';
         document.getElementById('teamGast').value = report.gast || '';
+
+        updateGastDropdowns();
 
         if (report.matches && report.matches.length > 0) {
             report.matches.forEach((m, index) => {
@@ -256,10 +368,13 @@
 
     function resetForm() {
         document.getElementById('savedReportsSelect').value = '';
+        document.getElementById('scheduleSelect').value = '';
         document.getElementById('datum').value = '';
         document.getElementById('spieltag').value = '1';
-        document.getElementById('spielort').value = '';
+        document.getElementById('spielort').value = 'Vereinsheim';
         document.getElementById('teamGast').value = '';
+
+        updateGastDropdowns();
 
         for (let i = 1; i <= totalMatches; i++) {
             document.getElementById(`passHeim_${i}`).value = '';
@@ -295,6 +410,7 @@
         }
 
         const payload = {
+            sheetName: SHEET_NAME,
             action: "saveNwdvReport",
             head: {
                 datum: document.getElementById('datum').value,
@@ -321,13 +437,13 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         }).then(() => {
-            alert("NWDV-Spielbericht erfolgreich in das Sheet übertragen!");
+            alert("NWDV-Spielbericht erfolgreich übermittelt!");
             setTimeout(loadReportsFromSheet, 1500);
         });
     }
 
-    buildTable();
-    loadReportsFromSheet();
+    // Anwendung beim Aufrufen der Seite initialisieren
+    initForm();
 </script>
 </body>
 </html>
