@@ -20,7 +20,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             justify-content: center;
         }
@@ -29,29 +29,36 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        h2 { color: var(--accent); text-align: center; margin-top: 10px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        h2 { color: var(--accent); text-align: center; margin-top: 0; font-size: 1.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         
-        .form-group { margin-bottom: 10px; }
-        label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; }
-        input, select { width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: white; box-sizing: border-box; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+        input, select { width: 100%; padding: 8px 10px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: white; box-sizing: border-box; font-size: 0.95rem; }
+        input:focus, select:focus { outline: 1px solid var(--accent); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; table-layout: fixed; }
+        th, td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: center; }
+        th { background: #0f172a; color: var(--accent); white-space: nowrap; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        th, td { border: 1px solid var(--border-color); padding: 6px; text-align: center; }
-        th { background: #0f172a; color: var(--accent); }
-        .score-input { width: 45px !important; text-align: center; }
-        .running-score { font-weight: bold; color: var(--success); }
+        /* Desktop-Größen für Eingaben */
+        .score-container { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .score-input { width: 45px !important; padding: 5px; text-align: center; font-weight: bold; font-size: 1rem; }
+        .pass-input { text-align: center; font-size: 0.85rem; }
         
-        button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1rem; }
+        .running-score { font-weight: bold; color: var(--success); font-size: 0.95rem; }
+        
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1.05rem; }
         button:hover { opacity: 0.9; }
         .btn-blue { background: var(--accent); }
-        .block-header { background: #334155; color: #fff; text-align: left; padding: 6px 10px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
+        .block-header { background: #334155; color: #fff; text-align: left; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
     </style>
 </head>
@@ -61,9 +68,9 @@
     <h2>NWDV Ligaspielbericht "Typ A"</h2>
 
     <!-- Archiv / Laden-Sektion -->
-    <div class="form-group" style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+    <div class="form-group" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
         <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen</label>
-        <div style="display:flex; gap: 10px;">
+        <div style="display:flex; gap: 12px;">
             <select id="savedReportsSelect" onchange="loadSelectedReport()">
                 <option value="">Lade gespeicherte Berichte...</option>
             </select>
@@ -88,12 +95,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width:30px;">#</th>
+                <th style="width: 35px;">#</th>
+                <th style="width: 100px;">Pass Heim</th>
                 <th>Heim Spieler</th>
+                <th style="width: 100px;">Pass Gast</th>
                 <th>Gast Spieler</th>
-                <th style="width:90px;">Legs</th>
-                <th style="width:110px;">Zwischenstand (Legs)</th>
-                <th style="width:110px;">Zwischenstand (Spstd.)</th>
+                <th style="width: 130px;">Legs</th>
+                <th style="width: 110px;">Zw. Stand (Legs)</th>
+                <th style="width: 110px;">Zw. Stand (Spstd.)</th>
             </tr>
         </thead>
         <tbody id="matchTableBody"></tbody>
@@ -127,11 +136,16 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><b>${i}</b></td>
+                <td><input type="text" class="pass-input" id="passHeim_${i}" placeholder="Pass-Nr."></td>
                 <td><input type="text" id="pHeim_${i}" placeholder="Spieler Heim"></td>
+                <td><input type="text" class="pass-input" id="passGast_${i}" placeholder="Pass-Nr."></td>
                 <td><input type="text" id="pGast_${i}" placeholder="Spieler Gast"></td>
                 <td>
-                    <input type="number" class="score-input" id="lHeim_${i}" min="0" oninput="calculateScores()"> :
-                    <input type="number" class="score-input" id="lGast_${i}" min="0" oninput="calculateScores()">
+                    <div class="score-container">
+                        <input type="number" class="score-input" id="lHeim_${i}" min="0" oninput="calculateScores()">
+                        <span>:</span>
+                        <input type="number" class="score-input" id="lGast_${i}" min="0" oninput="calculateScores()">
+                    </div>
                 </td>
                 <td class="running-score" id="zsLegs_${i}">-</td>
                 <td class="running-score" id="zsSpstd_${i}">-</td>
@@ -142,7 +156,7 @@
 
     function addBlockHeader(tbody, text) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="6" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
+        tr.innerHTML = `<td colspan="8" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
         tbody.appendChild(tr);
     }
 
@@ -212,7 +226,6 @@
         const report = allReports[idx];
         if (!report) return;
 
-        // Kopfdaten füllen
         if (report.datum) document.getElementById('datum').value = report.datum.substring(0, 10);
         document.getElementById('spieltag').value = report.spieltag || 1;
         document.getElementById('liga').value = report.liga || '';
@@ -220,11 +233,12 @@
         document.getElementById('teamHeim').value = report.heim || '';
         document.getElementById('teamGast').value = report.gast || '';
 
-        // Matches füllen
         if (report.matches && report.matches.length > 0) {
             report.matches.forEach((m, index) => {
                 const i = index + 1;
+                document.getElementById(`passHeim_${i}`).value = m.passHeim || '';
                 document.getElementById(`pHeim_${i}`).value = m.pHeim || '';
+                document.getElementById(`passGast_${i}`).value = m.passGast || '';
                 document.getElementById(`pGast_${i}`).value = m.pGast || '';
                 document.getElementById(`lHeim_${i}`).value = m.lHeim || '';
                 document.getElementById(`lGast_${i}`).value = m.lGast || '';
@@ -232,7 +246,6 @@
             calculateScores();
         }
 
-        // Bestleistungen füllen
         if (report.bestleistungen) {
             document.getElementById('blHighscore').value = report.bestleistungen.highscore || '';
             document.getElementById('blHighfinish').value = report.bestleistungen.highfinish || '';
@@ -249,7 +262,9 @@
         document.getElementById('teamGast').value = '';
 
         for (let i = 1; i <= totalMatches; i++) {
+            document.getElementById(`passHeim_${i}`).value = '';
             document.getElementById(`pHeim_${i}`).value = '';
+            document.getElementById(`passGast_${i}`).value = '';
             document.getElementById(`pGast_${i}`).value = '';
             document.getElementById(`lHeim_${i}`).value = '';
             document.getElementById(`lGast_${i}`).value = '';
@@ -268,7 +283,9 @@
         for (let i = 1; i <= totalMatches; i++) {
             matches.push({
                 nr: i,
+                passHeim: document.getElementById(`passHeim_${i}`).value,
                 pHeim: document.getElementById(`pHeim_${i}`).value,
+                passGast: document.getElementById(`passGast_${i}`).value,
                 pGast: document.getElementById(`pGast_${i}`).value,
                 lHeim: document.getElementById(`lHeim_${i}`).value,
                 lGast: document.getElementById(`lGast_${i}`).value,
