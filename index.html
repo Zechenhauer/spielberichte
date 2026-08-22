@@ -175,9 +175,9 @@
         const tr = document.createElement('tr');
         let opts = ourTeamRoster.filter(p => !absager.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
         if(isDouble) {
-            tr.innerHTML = `<td><b>Doppel ${idx-8}</b></td><td><div class="double-selects"><select id="heim_${idx}_a">${opts}</select><select id="heim_${idx}_b">${opts}</select></div></td>`;
+            tr.innerHTML = `<td><b>Doppel ${idx-8}</b></td><td><div class="double-selects"><select id="heim_${idx}_a"><option value="">-- Spieler 1 --</option>${opts}</select><select id="heim_${idx}_b"><option value="">-- Spieler 2 --</option>${opts}</select></div></td>`;
         } else {
-            tr.innerHTML = `<td><b>Einzel ${idx}</b></td><td><select id="heim_${idx}">${opts}</select></td>`;
+            tr.innerHTML = `<td><b>Einzel ${idx}</b></td><td><select id="heim_${idx}"><option value="">-- Spieler wählen --</option>${opts}</select></td>`;
         }
         return tr;
     }
@@ -197,21 +197,26 @@
         for(let i=0; i<12; i++) {
             const jV = jList[i]?.heim || "", mV = mList[i]?.heim || "";
             const match = (jV && mV && jV === mV);
-            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8 ? 'E'+(i+1) : 'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td><input type="text" id="final_${i}" value="${match ? jV : ''}" style="width:100%; text-align:center; background:#000; color:#fff; border:1px solid var(--gold);"></td></tr>`;
+            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8 ? 'E'+(i+1) : 'D'+(i-7)}</td><td>${jV || '-'}</td><td>${mV || '-'}</td><td><input type="text" id="final_${i}" value="${match ? jV : ''}" style="width:100%; text-align:center; background:#000; color:#fff; border:1px solid var(--gold); padding:6px; border-radius:4px;"></td></tr>`;
         }
     }
 
     function loadExistingAufstellung() {
         const st = document.getElementById('spieltagNummer').value;
         const my = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == st);
+        
         if(my?.payload?.aufstellung) {
             my.payload.aufstellung.forEach((x, i) => {
                 const idx = i + 1;
-                if(idx <= 8) document.getElementById(`heim_${idx}`).value = x.heim;
-                else {
-                    const p = x.heim.split(" + ");
-                    document.getElementById(`heim_${idx}_a`).value = p[0];
-                    document.getElementById(`heim_${idx}_b`).value = p[1];
+                if(idx <= 8) {
+                    let sel = document.getElementById(`heim_${idx}`);
+                    if(sel) sel.value = x.heim || "";
+                } else {
+                    let parts = (x.heim || "").split(" + ");
+                    let selA = document.getElementById(`heim_${idx}_a`);
+                    let selB = document.getElementById(`heim_${idx}_b`);
+                    if(selA && parts[0]) selA.value = parts[0].trim();
+                    if(selB && parts[1]) selB.value = parts[1].trim();
                 }
             });
         }
@@ -221,7 +226,15 @@
     function saveMyAufstellung() {
         let list = [];
         for(let i=1; i<=12; i++) {
-            list.push({spiel: i<=8 ? 'E'+i : 'D'+(i-8), heim: i<=8 ? document.getElementById('heim_'+i).value : document.getElementById('heim_'+i+'_a').value + ' + ' + document.getElementById('heim_'+i+'_b').value});
+            let val = "";
+            if(i<=8) {
+                val = document.getElementById('heim_'+i).value;
+            } else {
+                let pA = document.getElementById('heim_'+i+'_a').value;
+                let pB = document.getElementById('heim_'+i+'_b').value;
+                val = (pA && pB) ? `${pA} + ${pB}` : "";
+            }
+            list.push({spiel: i<=8 ? 'E'+i : 'D'+(i-8), heim: val});
         }
         const url = new URL(GOOGLE_SCRIPT_URL);
         url.searchParams.append("action", "saveNwdvAufstellung");
