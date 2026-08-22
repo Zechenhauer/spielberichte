@@ -7,260 +7,133 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root {
-            --navy: #050a14;
-            --gold: #D4AF37;
-            --gold-dim: rgba(212, 175, 55, 0.1);
-            --white: #ffffff;
-            --card-bg: #0c1626;
-            --accent-blue: #0074D9;
-            --text-main: #e2e8f0;
-            --text-dim: #94a3b8;
-            --zusage: #10b981;
-        }
-
+        :root { --navy: #050a14; --gold: #D4AF37; --gold-dim: rgba(212, 175, 55, 0.1); --white: #ffffff; --card-bg: #0c1626; --text-main: #e2e8f0; --text-dim: #94a3b8; --zusage: #10b981; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
-        
-        .container {
-            background-color: var(--navy);
-            border: 1px solid var(--gold-dim);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 1100px;
-            margin: 0 auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; margin-top: 0; font-size: 1.8rem; margin-bottom: 20px; }
-        
-        .role-box {
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid var(--gold);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: bold;
-            color: var(--gold);
-            font-size: 1.1rem;
-        }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 6px; color: white; font-size: 0.95rem; }
-        input:focus, select:focus { border-color: var(--gold); outline: none; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; font-size: 0.9rem; }
-        th { background: rgba(255,255,255,0.03); color: var(--gold); font-family: 'Poppins'; text-transform: uppercase; font-size: 0.8rem; }
-        
-        .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 10px 15px; font-weight: bold; font-family: 'Poppins'; }
-        .double-selects { display: flex; gap: 5px; }
-        .double-selects select { flex: 1; }
-
-        .save-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 25px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .save-btn:hover { opacity: 0.9; }
-
-        .compare-section { margin-top: 40px; background: rgba(0, 116, 217, 0.05); border: 1px solid var(--accent-blue); border-radius: 12px; padding: 20px; }
-        .compare-section h3 { color: var(--accent-blue); font-family: 'Poppins'; margin-bottom: 15px; text-align: center; }
-
-        .back-link { display: inline-block; margin-bottom: 15px; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
-        .back-link:hover { color: var(--gold); }
+        body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 10px; }
+        .container { background-color: var(--navy); border: 1px solid var(--gold-dim); border-radius: 12px; padding: 15px; max-width: 1100px; margin: 0 auto; }
+        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.4rem; margin-bottom: 15px; }
+        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 8px; text-align: center; margin-bottom: 15px; font-size: 0.9rem; color: var(--gold); }
+        input, select { width: 100%; padding: 8px; background: #000; border: 1px solid #333; border-radius: 4px; color: white; font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--card-bg); font-size: 0.75rem; }
+        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 5px; text-align: center; }
+        th { background: rgba(255,255,255,0.03); color: var(--gold); }
+        .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 5px 10px; font-weight: bold; }
+        .save-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 15px; text-transform: uppercase; }
+        .compare-section { margin-top: 25px; background: rgba(0, 116, 217, 0.05); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 10px; }
+        .back-link { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; }
+        #compareTable select { width: 100%; font-size: 0.7rem; padding: 2px; background: #000; color: #fff; border: 1px solid var(--gold); }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
-    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Finale Aufstellung</span></h2>
-    
+    <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zum Dashboard</a>
+    <h2>MF Kaderplanung</h2>
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
-
-    <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--gold-dim); border-radius: 8px;">
-        <label style="color: var(--gold);">Spieltag wählen</label>
-        <select id="scheduleSelect" onchange="applyScheduleSelection()">
-            <option value="">-- Bitte Spieltag wählen --</option>
-        </select>
-    </div>
-
-    <div class="grid-4">
-        <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
-        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1" onchange="applyScheduleSelection()"></div>
-        <div class="form-group"><label>Liga</label><input type="text" id="liga" value="Bezirksklasse 05"></div>
-        <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
-    </div>
-    
-    <div class="grid-2" style="grid-template-columns: 1fr;">
-        <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 1919 e.V. 3"></div>
-    </div>
-
+    <select id="scheduleSelect" onchange="applySelection()" style="margin-bottom:10px;"></select>
     <table>
-        <thead><tr><th>Spiel #</th><th>Heim Spieler (TV Kapellen 3)</th></tr></thead>
+        <thead><tr><th>Spiel</th><th>Heim Spieler</th></tr></thead>
         <tbody id="matchTableBody"></tbody>
     </table>
-
     <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
-
     <div class="compare-section">
-        <h3><i class="fa-solid fa-people-arrows"></i> Abgleich für Spieltag <span id="compareSpieltagLabel">1</span></h3>
+        <h3><i class="fa-solid fa-people-arrows"></i> Finale Aufstellung</h3>
         <table id="compareTable">
-            <thead><tr><th>Spiel</th><th>Jürgen</th><th>Markus</th><th>FINALE AUFSTELLUNG</th></tr></thead>
+            <thead><tr><th>Spiel</th><th>Jürg</th><th>Mark</th><th>FINAL</th></tr></thead>
             <tbody id="compareTableBody"></tbody>
         </table>
-
-        <div style="margin-top: 25px; background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-            <div>
-                <input type="checkbox" id="chk-public-visibility" style="transform: scale(1.4); margin-right: 10px;">
-                <label for="chk-public-visibility" style="color: var(--white); font-weight: bold; cursor: pointer;">Freigeben (TRUE)</label>
-            </div>
-            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Speichern & Team-Freigabe</button>
+        <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="chk-public-visibility"> <label for="chk-public-visibility" style="font-size:0.8rem;">Freigeben (TRUE)</label>
+            <button class="save-btn" style="margin-top:0; padding:10px;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
         </div>
     </div>
 </div>
-
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
-    
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
     const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
-
     let globalServerData = null;
     const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"];
-
     const schedule = {"2026-09-05":"TV Kapellen 1919 e.V. 2","2026-09-18":"DSC Goch 3","2026-09-25":"Rumelner TV 3","2026-10-10":"DSC Goch 4","2026-10-23":"Triple Inn Issum 2","2026-11-07":"SV Menzelen 1925","2026-11-13":"Die Wardter Darter","2026-11-27":"The Red Lions Xanten 1","2027-01-09":"Hart am Draht","2027-01-22":"TV Kapellen 1919 e.V. 2","2027-02-06":"DSC Goch 3","2027-02-19":"Rumelner TV 3","2027-03-05":"DSC Goch 4","2027-03-13":"Triple Inn Issum 2","2027-04-02":"SV Menzelen 1925","2027-04-24":"Die Wardter Darter","2027-05-08":"The Red Lions Xanten 1","2027-05-14":"Hart am Draht"};
 
-    function populateScheduleSelect() {
+    function init() {
         const select = document.getElementById('scheduleSelect');
-        let index = 1;
-        for (const [date, team] of Object.entries(schedule)) {
-            const opt = document.createElement('option');
-            opt.value = date; opt.dataset.spieltag = index;
-            opt.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
-            select.appendChild(opt); index++;
+        Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}" data-team="${team}">${i+1}: vs ${team}</option>`);
+        loadDataFromServer();
+    }
+    function applySelection() { buildTable(); loadExisting(); }
+    function buildTable() {
+        const st = document.getElementById('scheduleSelect').value;
+        const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
+        const tbody = document.getElementById('matchTableBody'); tbody.innerHTML = '';
+        let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
+        for(let i=1; i<=12; i++) {
+            let row = document.createElement('tr');
+            if(i<=8) row.innerHTML = `<td>E${i}</td><td><select id="h${i}"><option value="">--</option>${opts}</select></td>`;
+            else row.innerHTML = `<td>D${i-8}</td><td><select id="h${i}a"><option value="">P1</option>${opts}</select><select id="h${i}b"><option value="">P2</option>${opts}</select></td>`;
+            tbody.appendChild(row);
         }
     }
-
-    function applyScheduleSelection() {
-        const opt = document.getElementById('scheduleSelect').options[document.getElementById('scheduleSelect').selectedIndex];
-        if(!opt.value) return;
-        document.getElementById('datum').value = opt.value;
-        document.getElementById('spieltagNummer').value = opt.dataset.spieltag;
-        buildMinimalTable(); loadExistingAufstellung();
-    }
-
-    function getAbsager(st) {
-        if(!globalServerData || !globalServerData.spieltage) return [];
-        const s = globalServerData.spieltage.find(x => x.id == st);
-        return s ? s.absagen : [];
-    }
-
-    function buildMinimalTable() {
-        const tbody = document.getElementById('matchTableBody');
-        tbody.innerHTML = '';
-        const st = document.getElementById('spieltagNummer').value;
-        const absager = getAbsager(st);
-        
-        tbody.insertAdjacentHTML('beforeend', `<tr><td colspan="2" class="block-header">Block 1: Einzel (1-8)</td></tr>`);
-        for(let i=1; i<=8; i++) tbody.appendChild(createRow(i, absager, false));
-        tbody.insertAdjacentHTML('beforeend', `<tr><td colspan="2" class="block-header">Block 2: Doppel (1-4)</td></tr>`);
-        for(let i=1; i<=4; i++) tbody.appendChild(createRow(i+8, absager, true));
-    }
-
-    function createRow(idx, absager, isDouble) {
-        const tr = document.createElement('tr');
-        let opts = ourTeamRoster.filter(p => !absager.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
-        if(isDouble) {
-            tr.innerHTML = `<td><b>Doppel ${idx-8}</b></td><td><div class="double-selects"><select id="heim_${idx}_a"><option value="">-- Spieler 1 --</option>${opts}</select><select id="heim_${idx}_b"><option value="">-- Spieler 2 --</option>${opts}</select></div></td>`;
-        } else {
-            tr.innerHTML = `<td><b>Einzel ${idx}</b></td><td><select id="heim_${idx}"><option value="">-- Spieler wählen --</option>${opts}</select></td>`;
-        }
-        return tr;
-    }
-
     async function loadDataFromServer() {
-        let res = await fetch(GOOGLE_SCRIPT_URL);
-        globalServerData = await res.json();
-        applyScheduleSelection();
+        let res = await fetch(GOOGLE_SCRIPT_URL); globalServerData = await res.json();
+        applySelection();
     }
-
     function renderCompareTable(st) {
-        const tbody = document.getElementById('compareTableBody');
-        tbody.innerHTML = '';
-        const jList = (globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("jürgen") && a.spieltag == st)||{}).payload?.aufstellung || [];
-        const mList = (globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("markus") && a.spieltag == st)||{}).payload?.aufstellung || [];
-
+        const tbody = document.getElementById('compareTableBody'); tbody.innerHTML = '';
+        const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
+        let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
+        const jList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Jürgen") && a.spieltag == st)?.payload?.aufstellung || [];
+        const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
         for(let i=0; i<12; i++) {
-            const jV = jList[i]?.heim || "", mV = mList[i]?.heim || "";
-            const match = (jV && mV && jV === mV);
-            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8 ? 'E'+(i+1) : 'D'+(i-7)}</td><td>${jV || '-'}</td><td>${mV || '-'}</td><td><input type="text" id="final_${i}" value="${match ? jV : ''}" style="width:100%; text-align:center; background:#000; color:#fff; border:1px solid var(--gold); padding:6px; border-radius:4px;"></td></tr>`;
+            let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
+            let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select>`;
+            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td style="font-size:0.7rem;">${jV}</td><td style="font-size:0.7rem;">${mV}</td><td>${fin}</td></tr>`;
+            if(match) {
+                if(i<8) document.getElementById('f'+i).value = jV;
+                else { let p = jV.split(" & "); document.getElementById('f'+i+'a').value = p[0]||""; document.getElementById('f'+i+'b').value = p[1]||""; }
+            }
         }
     }
-
-    function loadExistingAufstellung() {
-        const st = document.getElementById('spieltagNummer').value;
-        const my = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == st);
-        
+    function loadExisting() {
+        const st = document.getElementById('scheduleSelect').value;
+        const my = globalServerData.mfAufstellungen.find(a => a.manager.includes(cleanUser) && a.spieltag == st);
         if(my?.payload?.aufstellung) {
             my.payload.aufstellung.forEach((x, i) => {
-                const idx = i + 1;
-                if(idx <= 8) {
-                    let sel = document.getElementById(`heim_${idx}`);
-                    if(sel) sel.value = x.heim || "";
-                } else {
-                    // Korrigiertes Trennzeichen von " + " auf " & "
-                    let parts = (x.heim || "").split(" & ");
-                    let selA = document.getElementById(`heim_${idx}_a`);
-                    let selB = document.getElementById(`heim_${idx}_b`);
-                    if(selA && parts[0]) selA.value = parts[0].trim();
-                    if(selB && parts[1]) selB.value = parts[1].trim();
-                }
+                if(i<8) { let s = document.getElementById('h'+(i+1)); if(s) s.value = x.heim; }
+                else { let p = x.heim.split(" & "); document.getElementById('h'+(i+1)+'a').value = p[0]||""; document.getElementById('h'+(i+1)+'b').value = p[1]||""; }
             });
         }
         renderCompareTable(st);
     }
-
     function saveMyAufstellung() {
         let list = [];
         for(let i=1; i<=12; i++) {
-            let val = "";
-            if(i<=8) {
-                val = document.getElementById('heim_'+i).value;
-            } else {
-                let pA = document.getElementById('heim_'+i+'_a').value;
-                let pB = document.getElementById('heim_'+i+'_b').value;
-                val = (pA && pB) ? `${pA} & ${pB}` : "";
-            }
-            list.push({spiel: i<=8 ? 'E'+i : 'D'+(i-8), heim: val});
+            let val = i<=8 ? document.getElementById('h'+i).value : document.getElementById('h'+i+'a').value + ' & ' + document.getElementById('h'+i+'b').value;
+            list.push({spiel: i<=8?'E'+i:'D'+(i-8), heim: val});
         }
-        const url = new URL(GOOGLE_SCRIPT_URL);
-        url.searchParams.append("action", "saveNwdvAufstellung");
-        url.searchParams.append("spieler", cleanUser);
-        url.searchParams.append("spieltag", document.getElementById('spieltagNummer').value);
+        const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveNwdvAufstellung");
+        url.searchParams.append("spieler", cleanUser); url.searchParams.append("spieltag", document.getElementById('scheduleSelect').value);
         url.searchParams.append("payload", JSON.stringify({aufstellung: list}));
-        new Image().src = url.toString();
-        alert("Planung gespeichert!"); setTimeout(loadDataFromServer, 1000);
+        new Image().src = url.toString(); alert("Gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
-
     function saveFinalAufstellungToSheet() {
-        const st = document.getElementById('spieltagNummer').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
+        const st = document.getElementById('scheduleSelect').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
         let e1 = [], d = [];
-        for(let i=0; i<8; i++) { let v = document.getElementById('final_'+i).value; if(v) e1.push(v + " (E"+(i+1)+")"); }
-        for(let i=8; i<12; i++) { let v = document.getElementById('final_'+i).value; if(v) d.push(v + " (D"+(i-7)+")"); }
-        const url = new URL(GOOGLE_SCRIPT_URL);
-        url.searchParams.append("action", "saveAufstellung");
+        for(let i=0; i<8; i++) { let v = document.getElementById('f'+i).value; if(v) e1.push(v + " (E"+(i+1)+")"); }
+        for(let i=8; i<12; i++) { 
+            let sA = document.getElementById('f'+i+'a'), sB = document.getElementById('f'+i+'b'); 
+            let doppelNummer = i - 7;
+            if(sA.value && sB.value) {
+                d.push(sA.value + " + " + sB.value + " (D" + doppelNummer + ")");
+            } 
+        }
+        const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveAufstellung");
         url.searchParams.append("id", st); url.searchParams.append("rolle", rolle);
         url.searchParams.append("einzel1", e1.join(", ")); url.searchParams.append("doppel", d.join(", "));
         url.searchParams.append("freigegeben", document.getElementById('chk-public-visibility').checked);
-        new Image().src = url.toString();
-        alert("Finale Aufstellung gespeichert!"); setTimeout(loadDataFromServer, 1000);
+        new Image().src = url.toString(); alert("Final gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
-
-    populateScheduleSelect(); loadDataFromServer();
+    init();
 </script>
 </body>
 </html>
