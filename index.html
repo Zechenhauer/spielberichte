@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Vergleich</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Freigabe</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -104,7 +104,7 @@
 
 <div class="container">
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
-    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Direktvergleich</span></h2>
+    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Team-Freigabe</span></h2>
     
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
@@ -133,7 +133,6 @@
             <tr>
                 <th style="width: 100px;">Spiel #</th>
                 <th>Heim Spieler (TV Kapellen 3)</th>
-                <th>Gast Spieler (Gegner)</th>
             </tr>
         </thead>
         <tbody id="matchTableBody">
@@ -141,24 +140,36 @@
         </tbody>
     </table>
 
-    <button class="save-btn" onclick="saveMyAufstellung()">Aufstellung im Sheet speichern</button>
+    <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
 
-    <!-- LIVE-VERGLEICH BERLEICH -->
+    <!-- DIREKTVERGLEICH & FREIGABE BEREICH -->
     <div class="compare-section">
         <h3><i class="fa-solid fa-people-arrows"></i> Direktvergleich für Spieltag <span id="compareSpieltagLabel">1</span></h3>
-        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Hier siehst du im direkten Vergleich, was Jürgen und Markus eingetragen haben.</p>
+        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Vergleich zwischen Jürgen und Markus. Setze unten den Haken zur Freigabe, sobald die Aufstellung final ist.</p>
+        
         <table id="compareTable">
             <thead>
                 <tr>
                     <th>Spiel</th>
-                    <th>Jürgen Schützendorf</th>
-                    <th>Markus Ginsel</th>
+                    <th>Jürgen (MF1)</th>
+                    <th>Markus (MF2)</th>
                 </tr>
             </thead>
             <tbody id="compareTableBody">
                 <tr><td colspan="3" style="text-align:center; color: var(--text-dim);">Lade Vergleichsdaten...</td></tr>
             </tbody>
         </table>
+
+        <!-- Freigabe-Checkbox & Finaler Speicher-Button -->
+        <div style="margin-top: 25px; background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <input type="checkbox" id="chk-public-visibility" style="transform: scale(1.4); accent-color: var(--gold); cursor: pointer; margin-right: 10px;">
+                <label for="chk-public-visibility" style="font-size: 1rem; font-weight: bold; color: var(--white); cursor: pointer; display:inline;">
+                    Aufstellung für das ganze Team freigeben (Spalte 'Freigegeben' = TRUE)
+                </label>
+            </div>
+            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Freigabe & Aufstellung fixieren</button>
+        </div>
     </div>
 </div>
 
@@ -229,7 +240,7 @@
         tbody.innerHTML = '';
 
         const headerE = document.createElement('tr');
-        headerE.innerHTML = `<td colspan="3" class="block-header">Block 1: Einzel (1 - 8)</td>`;
+        headerE.innerHTML = `<td colspan="2" class="block-header">Block 1: Einzel (1 - 8)</td>`;
         tbody.appendChild(headerE);
 
         for(let i = 1; i <= 8; i++) {
@@ -237,7 +248,7 @@
         }
 
         const headerD = document.createElement('tr');
-        headerD.innerHTML = `<td colspan="3" class="block-header">Block 2: Doppel (1 - 4)</td>`;
+        headerD.innerHTML = `<td colspan="2" class="block-header">Block 2: Doppel (1 - 4)</td>`;
         tbody.appendChild(headerD);
 
         for(let i = 1; i <= 4; i++) {
@@ -247,13 +258,12 @@
 
     function createSingleRow(label, index) {
         const tr = document.createElement('tr');
-        let optionsHeim = '<option value="">-- Spieler --</option>';
+        let optionsHeim = '<option value="">-- Spieler wählen --</option>';
         ourTeamRoster.forEach(p => { optionsHeim += `<option value="${p}">${p}</option>`; });
 
         tr.innerHTML = `
             <td><b>${label}</b></td>
             <td><select id="heim_${index}">${optionsHeim}</select></td>
-            <td><input type="text" id="gast_${index}" placeholder="Gegner Spieler"></td>
         `;
         return tr;
     }
@@ -273,12 +283,6 @@
                 <div class="double-selects">
                     <select id="heim_${index}_a">${optionsHeim1}</select>
                     <select id="heim_${index}_b">${optionsHeim2}</select>
-                </div>
-            </td>
-            <td>
-                <div class="double-selects">
-                    <input type="text" id="gast_${index}_a" placeholder="Gegner 1">
-                    <input type="text" id="gast_${index}_b" placeholder="Gegner 2">
                 </div>
             </td>
         `;
@@ -301,7 +305,6 @@
 
         if (!globalServerData || !globalServerData.mfAufstellungen) return;
 
-        // Finde die Aufstellung des aktuell eingeloggten Users, um das Formular vorauszufüllen
         const mySaved = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == currentSpieltag);
         
         if (mySaved && mySaved.payload && mySaved.payload.aufstellung) {
@@ -310,9 +313,8 @@
                 if (i <= 8) {
                     const sel = document.getElementById(`heim_${i}`);
                     if (sel) sel.value = item.heim || "";
-                    // Optional den Gegner füllen, falls dort was stand
                 } else {
-                    const parts = (item.heim || "").split(" & ");
+                    const parts = (item.heim || "").split(" + ");
                     const selA = document.getElementById(`heim_${i}_a`);
                     const selB = document.getElementById(`heim_${i}_b`);
                     if (selA && parts[0]) selA.value = parts[0].trim();
@@ -321,7 +323,6 @@
             });
             if (mySaved.payload.gegner) document.getElementById('teamGast').value = mySaved.payload.gegner;
         } else {
-            // Felder leeren, wenn noch nichts da ist
             for(let i=1; i<=12; i++) {
                 if(i<=8) {
                     let s = document.getElementById(`heim_${i}`); if(s) s.value="";
@@ -352,10 +353,9 @@
 
         for (let i = 0; i < 12; i++) {
             const spielName = i < 8 ? `Einzel ${i+1}` : `Doppel ${i-7}`;
-            const jVal = jList[i] ? (jList[i].heim || "-") : "<i>Nicht eingetragen</i>";
-            const mVal = mList[i] ? (mList[i].heim || "-") : "<i>Nicht eingetragen</i>";
+            const jVal = jList[i] ? (jList[i].heim || "-") : "-";
+            const mVal = mList[i] ? (mList[i].heim || "-") : "-";
 
-            // Farbmarkierung bei Übereinstimmung
             let rowStyle = "";
             if (jList[i] && mList[i] && jList[i].heim && mList[i].heim && jList[i].heim === mList[i].heim) {
                 rowStyle = "background: rgba(16, 185, 129, 0.1);"; // zartes Grün bei Übereinstimmung
@@ -378,14 +378,12 @@
             if (i <= 8) {
                 matchData.push({
                     spiel: `Einzel ${i}`,
-                    heim: document.getElementById(`heim_${i}`).value,
-                    gast: document.getElementById(`gast_${i}`).value
+                    heim: document.getElementById(`heim_${i}`).value
                 });
             } else {
                 matchData.push({
                     spiel: `Doppel ${i-8}`,
-                    heim: `${document.getElementById(`heim_${i}_a`).value} & ${document.getElementById(`heim_${i}_b`).value}`,
-                    gast: `${document.getElementById(`gast_${i}_b`)?.value || ''}`
+                    heim: `${document.getElementById(`heim_${i}_a`).value} + ${document.getElementById(`heim_${i}_b`).value}`
                 });
             }
         }
@@ -407,9 +405,49 @@
         const img = new Image();
         img.src = url.toString();
 
-        alert("Aufstellung für Spieltag " + currentSpieltag + " erfolgreich gespeichert!");
-        
-        // Kurz warten, damit das Sheet den Eintrag verarbeitet hat, dann Daten neu laden
+        alert("Planung für Spieltag " + currentSpieltag + " gespeichert!");
+        setTimeout(loadDataFromServer, 1500);
+    }
+
+    function saveFinalAufstellungToSheet() {
+        const currentSpieltag = document.getElementById('spieltagNummer').value;
+        const rolle = cleanUser.toLowerCase().includes("jürgen") ? "MF1" : "MF2";
+        const isFreigegeben = document.getElementById('chk-public-visibility').checked;
+
+        let e1Arr = [];
+        let dArr = [];
+
+        // Einzel 1 bis 8
+        for (let i = 1; i <= 8; i++) {
+            let spielerVal = document.getElementById(`heim_${i}`).value;
+            if (spielerVal) {
+                e1Arr.push(`${spielerVal} (E${i})`);
+            }
+        }
+
+        // Doppel 1 bis 4 (Spiele 9 bis 12)
+        for (let i = 9; i <= 12; i++) {
+            let spieler1 = document.getElementById(`heim_${i}_a`)?.value;
+            let spieler2 = document.getElementById(`heim_${i}_b`)?.value;
+            let doppelNummer = i - 8;
+            if (spieler1 && spieler2) {
+                dArr.push(`${spieler1} + ${spieler2} (D${doppelNummer})`);
+            }
+        }
+
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        url.searchParams.append("action", "saveAufstellung");
+        url.searchParams.append("id", currentSpieltag);
+        url.searchParams.append("rolle", rolle);
+        url.searchParams.append("einzel1", e1Arr.join(", "));
+        url.searchParams.append("doppel", dArr.join(", "));
+        url.searchParams.append("einzel2", "");
+        url.searchParams.append("freigegeben", isFreigegeben);
+
+        const img = new Image();
+        img.src = url.toString();
+
+        alert(`Aufstellung für Spieltag ${currentSpieltag} (${rolle}) erfolgreich ins Tabellenblatt 'aufstellungen' übertragen! Freigabe: ${isFreigegeben}`);
         setTimeout(loadDataFromServer, 1500);
     }
 
