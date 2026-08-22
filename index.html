@@ -25,6 +25,14 @@
 
         .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 30px; font-size: 1.2rem; text-transform: uppercase; }
         .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 1rem; }
+
+        /* Chat Sektion */
+        .chat-section { margin-top: 50px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); padding: 25px; border-radius: 12px; }
+        .chat-box { height: 220px; background: #000; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; margin-bottom: 15px; font-size: 1rem; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { background: rgba(212, 175, 55, 0.08); padding: 10px 14px; border-radius: 6px; border-left: 3px solid var(--gold); }
+        .chat-msg span { font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 3px; }
+        .chat-input-row { display: flex; gap: 10px; }
+        .chat-input-row input { flex: 1; padding: 14px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -52,7 +60,20 @@
             <button class="save-btn" style="margin-top:0; padding:15px 30px;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
         </div>
     </div>
+
+    <!-- Chat Bereich -->
+    <div class="chat-section">
+        <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size: 1.5rem;"><i class="fa-solid fa-comments"></i> MF Absprache-Chat</h3>
+        <div class="chat-box" id="chatContainer">
+            <span style="color:#94a3b8; text-align:center;">Lade Nachrichten...</span>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Nachricht an Markus / Jürgen schreiben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="save-btn" style="width: auto; margin-top: 0; padding: 14px 25px; font-size: 1.1rem;" onclick="sendChatMessage()">Senden</button>
+        </div>
+    </div>
 </div>
+
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
@@ -67,7 +88,13 @@
         Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}">${i+1}: vs ${team}</option>`);
         loadDataFromServer();
     }
-    function applySelection() { buildTable(); loadExisting(); }
+    
+    function applySelection() { 
+        buildTable(); 
+        loadExisting(); 
+        renderChat(); 
+    }
+
     function buildTable() {
         const st = document.getElementById('scheduleSelect').value;
         const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
@@ -83,20 +110,26 @@
             tbody.appendChild(row);
         }
     }
+
     async function loadDataFromServer() {
-        let res = await fetch(GOOGLE_SCRIPT_URL); globalServerData = await res.json();
+        let res = await fetch(GOOGLE_SCRIPT_URL); 
+        globalServerData = await res.json();
         applySelection();
     }
+
     function renderCompareTable(st) {
         const tbody = document.getElementById('compareTableBody'); tbody.innerHTML = '';
         const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
         let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
         const jList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Jürgen") && a.spieltag == st)?.payload?.aufstellung || [];
         const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
+        
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<div class="double-selects"><select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select></div>`;
+            
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
+            
             if(match) {
                 if(i<8) {
                     document.getElementById('f'+i).value = jV;
@@ -110,6 +143,7 @@
             }
         }
     }
+
     function loadExisting() {
         const st = document.getElementById('scheduleSelect').value;
         const my = globalServerData.mfAufstellungen.find(a => a.manager.includes(cleanUser) && a.spieltag == st);
@@ -130,6 +164,47 @@
         }
         renderCompareTable(st);
     }
+
+    // Chat Rendering
+    function renderChat() {
+        const chatBox = document.getElementById('chatContainer');
+        chatBox.innerHTML = '';
+        const chats = globalServerData?.chats || [];
+
+        if(chats.length === 0) {
+            chatBox.innerHTML = `<span style="color:#94a3b8; text-align:center;">Noch keine Nachrichten vorhanden. Schreib die Erste!</span>`;
+            return;
+        }
+
+        chats.forEach(msg => {
+            chatBox.innerHTML += `<div class="chat-msg"><span><b>${msg.absender}</b> (${msg.zeit}):</span> ${msg.text}</div>`;
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        url.searchParams.append("action", "saveChat");
+        url.searchParams.append("spieler", cleanUser);
+        url.searchParams.append("text", text);
+        
+        new Image().src = url.toString();
+        
+        // Sofort lokal anzeigen
+        const chatBox = document.getElementById('chatContainer');
+        if(chatBox.innerHTML.includes("Noch keine Nachrichten")) chatBox.innerHTML = '';
+        const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        chatBox.innerHTML += `<div class="chat-msg"><span><b>${cleanUser}</b> (${timeNow}):</span> ${text}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        
+        input.value = '';
+        setTimeout(loadDataFromServer, 1500);
+    }
+
     function saveMyAufstellung() {
         let list = [];
         for(let i=1; i<=12; i++) {
@@ -139,8 +214,9 @@
         const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveNwdvAufstellung");
         url.searchParams.append("spieler", cleanUser); url.searchParams.append("spieltag", document.getElementById('scheduleSelect').value);
         url.searchParams.append("payload", JSON.stringify({aufstellung: list}));
-        new Image().src = url.toString(); alert("Gespeichert!"); setTimeout(loadDataFromServer, 1000);
+        new Image().src = url.toString(); alert("Planung gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
+
     function saveFinalAufstellungToSheet() {
         const st = document.getElementById('scheduleSelect').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
         let e1 = [], d = [];
@@ -152,6 +228,7 @@
         url.searchParams.append("freigegeben", document.getElementById('chk-public-visibility').checked);
         new Image().src = url.toString(); alert("Final gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
+
     init();
 </script>
 </body>
