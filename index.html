@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Freigabe</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Finale Aufstellung</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -104,7 +104,7 @@
 
 <div class="container">
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
-    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Team-Freigabe</span></h2>
+    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Finale Aufstellung</span></h2>
     
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
@@ -123,9 +123,8 @@
         <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
     </div>
     
-    <div class="grid-2">
+    <div class="grid-2" style="grid-template-columns: 1fr;">
         <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 1919 e.V. 3"></div>
-        <div class="form-group"><label>Gastmannschaft (Gegner)</label><input type="text" id="teamGast" placeholder="Gegner"></div>
     </div>
 
     <table>
@@ -142,10 +141,10 @@
 
     <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
 
-    <!-- DIREKTVERGLEICH & FREIGABE BEREICH -->
+    <!-- DIREKTVERGLEICH & FINALE AUFSTELLUNG BEREICH -->
     <div class="compare-section">
-        <h3><i class="fa-solid fa-people-arrows"></i> Direktvergleich für Spieltag <span id="compareSpieltagLabel">1</span></h3>
-        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Vergleich zwischen Jürgen und Markus. Setze unten den Haken zur Freigabe, sobald die Aufstellung final ist.</p>
+        <h3><i class="fa-solid fa-people-arrows"></i> Abgleich & Finale Aufstellung für Spieltag <span id="compareSpieltagLabel">1</span></h3>
+        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Hier siehst du positionsgenau, wo ihr euch einig seid (grün markiert). In der rechten Spalte legst du die <b>Finale Aufstellung</b> fest.</p>
         
         <table id="compareTable">
             <thead>
@@ -153,10 +152,11 @@
                     <th>Spiel</th>
                     <th>Jürgen (MF1)</th>
                     <th>Markus (MF2)</th>
+                    <th style="background: var(--gold); color: #000;">FINALE AUFSTELLUNG</th>
                 </tr>
             </thead>
             <tbody id="compareTableBody">
-                <tr><td colspan="3" style="text-align:center; color: var(--text-dim);">Lade Vergleichsdaten...</td></tr>
+                <tr><td colspan="4" style="text-align:center; color: var(--text-dim);">Lade Vergleichsdaten...</td></tr>
             </tbody>
         </table>
 
@@ -165,10 +165,10 @@
             <div>
                 <input type="checkbox" id="chk-public-visibility" style="transform: scale(1.4); accent-color: var(--gold); cursor: pointer; margin-right: 10px;">
                 <label for="chk-public-visibility" style="font-size: 1rem; font-weight: bold; color: var(--white); cursor: pointer; display:inline;">
-                    Aufstellung für das ganze Team freigeben (Spalte 'Freigegeben' = TRUE)
+                    Finale Aufstellung für das ganze Team freigeben (Spalte 'Freigegeben' = TRUE)
                 </label>
             </div>
-            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Freigabe & Aufstellung fixieren</button>
+            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Finale Aufstellung speichern & freigeben</button>
         </div>
     </div>
 </div>
@@ -230,7 +230,6 @@
 
         document.getElementById('datum').value = selectedOption.value;
         document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
-        document.getElementById('teamGast').value = selectedOption.dataset.team;
         
         loadExistingAufstellung();
     }
@@ -321,7 +320,6 @@
                     if (selB && parts[1]) selB.value = parts[1].trim();
                 }
             });
-            if (mySaved.payload.gegner) document.getElementById('teamGast').value = mySaved.payload.gegner;
         } else {
             for(let i=1; i<=12; i++) {
                 if(i<=8) {
@@ -341,7 +339,7 @@
         tbody.innerHTML = '';
 
         if (!globalServerData || !globalServerData.mfAufstellungen) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Keine Daten verfügbar</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Keine Daten verfügbar</td></tr>`;
             return;
         }
 
@@ -353,20 +351,28 @@
 
         for (let i = 0; i < 12; i++) {
             const spielName = i < 8 ? `Einzel ${i+1}` : `Doppel ${i-7}`;
-            const jVal = jList[i] ? (jList[i].heim || "-") : "-";
-            const mVal = mList[i] ? (mList[i].heim || "-") : "-";
+            
+            const jVal = jList[i] ? (jList[i].heim || "") : "";
+            const mVal = mList[i] ? (mList[i].heim || "") : "";
 
-            let rowStyle = "";
-            if (jList[i] && mList[i] && jList[i].heim && mList[i].heim && jList[i].heim === mList[i].heim) {
-                rowStyle = "background: rgba(16, 185, 129, 0.1);"; // zartes Grün bei Übereinstimmung
-            }
+            const isMatch = (jVal !== "" && mVal !== "" && jVal === mVal);
+            const rowStyle = isMatch ? "background: rgba(16, 185, 129, 0.2); border-bottom: 2px solid var(--zusage);" : "";
+
+            let defaultFinalVal = isMatch ? jVal : "";
 
             const tr = document.createElement('tr');
             tr.style = rowStyle;
             tr.innerHTML = `
                 <td><b>${spielName}</b></td>
-                <td>${jVal}</td>
-                <td>${mVal}</td>
+                <td>${jVal || "-"}</td>
+                <td>${mVal || "-"}</td>
+                <td style="background: rgba(212, 175, 55, 0.08);">
+                    <input type="text" id="final_input_${i+1}" value="${defaultFinalVal}" 
+                           placeholder="Finaler Spieler..." 
+                           style="width:100%; background: #000; border: 1px solid ${isMatch ? 'var(--zusage)' : 'var(--gold)'}; 
+                                  padding: 6px; border-radius: 4px; color: ${isMatch ? 'var(--zusage)' : '#fff'}; 
+                                  text-align: center; font-weight: bold;">
+                </td>
             `;
             tbody.appendChild(tr);
         }
@@ -392,7 +398,6 @@
         const payloadData = {
             spieltag: currentSpieltag,
             datum: document.getElementById('datum').value,
-            gegner: document.getElementById('teamGast').value,
             aufstellung: matchData
         };
 
@@ -417,21 +422,18 @@
         let e1Arr = [];
         let dArr = [];
 
-        // Einzel 1 bis 8
         for (let i = 1; i <= 8; i++) {
-            let spielerVal = document.getElementById(`heim_${i}`).value;
-            if (spielerVal) {
-                e1Arr.push(`${spielerVal} (E${i})`);
+            let val = document.getElementById(`final_input_${i}`).value.trim();
+            if (val && val !== "-") {
+                e1Arr.push(`${val} (E${i})`);
             }
         }
 
-        // Doppel 1 bis 4 (Spiele 9 bis 12)
         for (let i = 9; i <= 12; i++) {
-            let spieler1 = document.getElementById(`heim_${i}_a`)?.value;
-            let spieler2 = document.getElementById(`heim_${i}_b`)?.value;
+            let val = document.getElementById(`final_input_${i}`).value.trim();
             let doppelNummer = i - 8;
-            if (spieler1 && spieler2) {
-                dArr.push(`${spieler1} + ${spieler2} (D${doppelNummer})`);
+            if (val && val !== "-") {
+                dArr.push(`${val} (D${doppelNummer})`);
             }
         }
 
@@ -445,9 +447,9 @@
         url.searchParams.append("freigegeben", isFreigegeben);
 
         const img = new Image();
-        img.src = url.toString();
+        img.src.toString();
 
-        alert(`Aufstellung für Spieltag ${currentSpieltag} (${rolle}) erfolgreich ins Tabellenblatt 'aufstellungen' übertragen! Freigabe: ${isFreigegeben}`);
+        alert(`Finale Aufstellung für Spieltag ${currentSpieltag} (${rolle}) erfolgreich gespeichert! Freigabestatus: ${isFreigegeben ? "SICHTBAR FÜRS TEAM (TRUE)" : "INTERN (FALSE)"}`);
         setTimeout(loadDataFromServer, 1500);
     }
 
