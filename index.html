@@ -7,50 +7,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --navy: #050a14; --gold: #D4AF37; --gold-dim: rgba(212, 175, 55, 0.1); --white: #ffffff; --card-bg: #0c1626; --text-main: #e2e8f0; --text-dim: #94a3b8; --zusage: #10b981; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 10px; }
-        .container { background-color: var(--navy); border: 1px solid var(--gold-dim); border-radius: 12px; padding: 15px; max-width: 1100px; margin: 0 auto; }
-        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.4rem; margin-bottom: 15px; }
-        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 8px; text-align: center; margin-bottom: 15px; font-size: 0.9rem; color: var(--gold); }
-        input, select { width: 100%; padding: 8px; background: #000; border: 1px solid #333; border-radius: 4px; color: white; font-size: 0.85rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--card-bg); font-size: 0.75rem; }
-        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 5px; text-align: center; }
-        th { background: rgba(255,255,255,0.03); color: var(--gold); }
-        .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 5px 10px; font-weight: bold; }
-        .save-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 15px; text-transform: uppercase; }
-        .compare-section { margin-top: 25px; background: rgba(0, 116, 217, 0.05); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 10px; }
-        .back-link { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; }
-        #compareTable select { width: 100%; font-size: 0.7rem; padding: 2px; background: #000; color: #fff; border: 1px solid var(--gold); }
+        :root { --navy: #050a14; --gold: #D4AF37; --text-main: #e2e8f0; }
+        body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
+        .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 25px; max-width: 1100px; margin: 0 auto; }
+        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.6rem; margin-bottom: 20px; }
+        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 12px; text-align: center; margin-bottom: 20px; font-size: 1rem; color: var(--gold); font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0c1626; border-radius: 8px; font-size: 0.95rem; }
+        th, td { border: 1px solid rgba(255,255,255,0.1); padding: 15px; text-align: center; }
+        th { background: rgba(255,255,255,0.05); color: var(--gold); font-size: 0.9rem; text-transform: uppercase; }
+        select { width: 100%; padding: 10px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 4px; font-size: 0.9rem; margin: 2px 0; }
+        .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 25px; font-size: 1.1rem; text-transform: uppercase; }
+        .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; }
     </style>
 </head>
 <body>
 <div class="container">
     <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zum Dashboard</a>
     <h2>MF Kaderplanung</h2>
-    <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
-    <select id="scheduleSelect" onchange="applySelection()" style="margin-bottom:10px;"></select>
+    <div class="role-box" id="roleDisplay">Lade...</div>
+    <select id="scheduleSelect" onchange="applySelection()" style="padding:15px; margin-bottom:20px;"></select>
+    
     <table>
         <thead><tr><th>Spiel</th><th>Heim Spieler</th></tr></thead>
         <tbody id="matchTableBody"></tbody>
     </table>
     <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
-    <div class="compare-section">
-        <h3><i class="fa-solid fa-people-arrows"></i> Finale Aufstellung</h3>
+
+    <div style="margin-top: 40px; background: rgba(0, 116, 217, 0.05); border: 1px solid #0074D9; padding: 20px; border-radius: 12px;">
+        <h3 style="color:#0074D9; text-align:center; margin-bottom:15px;">Finale Aufstellung</h3>
         <table id="compareTable">
             <thead><tr><th>Spiel</th><th>Jürg</th><th>Mark</th><th>FINAL</th></tr></thead>
             <tbody id="compareTableBody"></tbody>
         </table>
-        <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
-            <input type="checkbox" id="chk-public-visibility"> <label for="chk-public-visibility" style="font-size:0.8rem;">Freigeben (TRUE)</label>
-            <button class="save-btn" style="margin-top:0; padding:10px;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
+        <div style="margin-top:20px; display:flex; align-items:center; gap:15px;">
+            <input type="checkbox" id="chk-public-visibility" style="transform:scale(1.5);"> 
+            <label for="chk-public-visibility" style="font-weight:bold;">Freigeben (TRUE)</label>
+            <button class="save-btn" style="margin-top:0;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
         </div>
     </div>
 </div>
+
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
-    const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
+    const cleanUser = currentUser.replace(/ \(.*\)/g, '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
     let globalServerData = null;
     const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"];
@@ -58,7 +58,7 @@
 
     function init() {
         const select = document.getElementById('scheduleSelect');
-        Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}" data-team="${team}">${i+1}: vs ${team}</option>`);
+        Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}">${i+1}: vs ${team}</option>`);
         loadDataFromServer();
     }
     function applySelection() { buildTable(); loadExisting(); }
@@ -87,10 +87,10 @@
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select>`;
-            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td style="font-size:0.7rem;">${jV}</td><td style="font-size:0.7rem;">${mV}</td><td>${fin}</td></tr>`;
+            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.1)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td style="font-size:0.8rem;">${jV}</td><td style="font-size:0.8rem;">${mV}</td><td>${fin}</td></tr>`;
             if(match) {
                 if(i<8) document.getElementById('f'+i).value = jV;
-                else { let p = jV.split(" & "); document.getElementById('f'+i+'a').value = p[0]||""; document.getElementById('f'+i+'b').value = p[1]||""; }
+                else { let p = jV.split(" + "); document.getElementById('f'+i+'a').value = p[0]||""; document.getElementById('f'+i+'b').value = p[1]||""; }
             }
         }
     }
@@ -100,7 +100,7 @@
         if(my?.payload?.aufstellung) {
             my.payload.aufstellung.forEach((x, i) => {
                 if(i<8) { let s = document.getElementById('h'+(i+1)); if(s) s.value = x.heim; }
-                else { let p = x.heim.split(" & "); document.getElementById('h'+(i+1)+'a').value = p[0]||""; document.getElementById('h'+(i+1)+'b').value = p[1]||""; }
+                else { let p = x.heim.split(" + "); document.getElementById('h'+(i+1)+'a').value = p[0]||""; document.getElementById('h'+(i+1)+'b').value = p[1]||""; }
             });
         }
         renderCompareTable(st);
@@ -108,7 +108,7 @@
     function saveMyAufstellung() {
         let list = [];
         for(let i=1; i<=12; i++) {
-            let val = i<=8 ? document.getElementById('h'+i).value : document.getElementById('h'+i+'a').value + ' & ' + document.getElementById('h'+i+'b').value;
+            let val = i<=8 ? document.getElementById('h'+i).value : document.getElementById('h'+i+'a').value + ' + ' + document.getElementById('h'+i+'b').value;
             list.push({spiel: i<=8?'E'+i:'D'+(i-8), heim: val});
         }
         const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveNwdvAufstellung");
@@ -120,13 +120,7 @@
         const st = document.getElementById('scheduleSelect').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
         let e1 = [], d = [];
         for(let i=0; i<8; i++) { let v = document.getElementById('f'+i).value; if(v) e1.push(v + " (E"+(i+1)+")"); }
-        for(let i=8; i<12; i++) { 
-            let sA = document.getElementById('f'+i+'a'), sB = document.getElementById('f'+i+'b'); 
-            let doppelNummer = i - 7;
-            if(sA.value && sB.value) {
-                d.push(sA.value + " + " + sB.value + " (D" + doppelNummer + ")");
-            } 
-        }
+        for(let i=8; i<12; i++) { let sA = document.getElementById('f'+i+'a'), sB = document.getElementById('f'+i+'b'); if(sA.value && sB.value) d.push(sA.value + " + " + sB.value + " (D"+(i-7)+")"); }
         const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveAufstellung");
         url.searchParams.append("id", st); url.searchParams.append("rolle", rolle);
         url.searchParams.append("einzel1", e1.join(", ")); url.searchParams.append("doppel", d.join(", "));
