@@ -115,13 +115,14 @@
         const my = globalServerData.mfAufstellungen.find(a => a.manager.includes(cleanUser) && a.spieltag == st);
         if(my?.payload?.aufstellung) {
             my.payload.aufstellung.forEach((x, i) => {
-                if(i < 8) { 
-                    let s = document.getElementById('h' + (i + 1)); 
+                let indexNum = i + 1;
+                if(indexNum <= 8) { 
+                    let s = document.getElementById('h' + indexNum); 
                     if(s) s.value = x.heim; 
                 } else { 
                     let parts = (x.heim || "").split(" + "); 
-                    let selA = document.getElementById('h' + (i + 1) + 'a');
-                    let selB = document.getElementById('h' + (i + 1) + 'b');
+                    let selA = document.getElementById('h' + indexNum + 'a');
+                    let selB = document.getElementById('h' + indexNum + 'b');
                     if(selA && parts[0]) selA.value = parts[0].trim(); 
                     if(selB && parts[1]) selB.value = parts[1].trim(); 
                 }
