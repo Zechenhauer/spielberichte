@@ -118,7 +118,7 @@
 
     <div class="grid-4">
         <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
-        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1" onchange="loadExistingAufstellung()"></div>
+        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1" onchange="applyScheduleSelection()"></div>
         <div class="form-group"><label>Liga</label><input type="text" id="liga" value="Bezirksklasse 05"></div>
         <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
     </div>
@@ -226,12 +226,19 @@
     function applyScheduleSelection() {
         const scheduleSelect = document.getElementById('scheduleSelect');
         const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
-        if (!selectedOption.value) return;
+        if (selectedOption && selectedOption.value) {
+            document.getElementById('datum').value = selectedOption.value;
+            document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
+        }
 
-        document.getElementById('datum').value = selectedOption.value;
-        document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
-        
+        buildMinimalTable();
         loadExistingAufstellung();
+    }
+
+    function getAbsagerForSpieltag(spieltagNummer) {
+        if (!globalServerData || !globalServerData.spieltage) return [];
+        const spiel = globalServerData.spieltage.find(s => s.id == spieltagNummer);
+        return spiel ? spiel.absagen : [];
     }
 
     function buildMinimalTable() {
@@ -257,8 +264,15 @@
 
     function createSingleRow(label, index) {
         const tr = document.createElement('tr');
+        const currentSpieltag = document.getElementById('spieltagNummer').value;
+        const absager = getAbsagerForSpieltag(currentSpieltag);
+
         let optionsHeim = '<option value="">-- Spieler wählen --</option>';
-        ourTeamRoster.forEach(p => { optionsHeim += `<option value="${p}">${p}</option>`; });
+        ourTeamRoster.forEach(p => { 
+            if (!absager.includes(p)) {
+                optionsHeim += `<option value="${p}">${p}</option>`; 
+            }
+        });
 
         tr.innerHTML = `
             <td><b>${label}</b></td>
@@ -269,11 +283,17 @@
 
     function createDoubleClickRow(label, index) {
         const tr = document.createElement('tr');
+        const currentSpieltag = document.getElementById('spieltagNummer').value;
+        const absager = getAbsagerForSpieltag(currentSpieltag);
+
         let optionsHeim1 = '<option value="">-- Spieler 1 --</option>';
         let optionsHeim2 = '<option value="">-- Spieler 2 --</option>';
+        
         ourTeamRoster.forEach(p => { 
-            optionsHeim1 += `<option value="${p}">${p}</option>`;
-            optionsHeim2 += `<option value="${p}">${p}</option>`;
+            if (!absager.includes(p)) {
+                optionsHeim1 += `<option value="${p}">${p}</option>`;
+                optionsHeim2 += `<option value="${p}">${p}</option>`;
+            }
         });
 
         tr.innerHTML = `
@@ -292,6 +312,7 @@
         try {
             let res = await fetch(GOOGLE_SCRIPT_URL);
             globalServerData = await res.json();
+            buildMinimalTable(); // Tabelle neu aufbauen, damit Absager greifen
             loadExistingAufstellung();
         } catch(e) {
             console.error("Fehler beim Laden der Serverdaten:", e);
@@ -447,14 +468,13 @@
         url.searchParams.append("freigegeben", isFreigegeben);
 
         const img = new Image();
-        img.src.toString();
+        img.src = url.toString();
 
         alert(`Finale Aufstellung für Spieltag ${currentSpieltag} (${rolle}) erfolgreich gespeichert! Freigabestatus: ${isFreigegeben ? "SICHTBAR FÜRS TEAM (TRUE)" : "INTERN (FALSE)"}`);
         setTimeout(loadDataFromServer, 1500);
     }
 
     populateScheduleSelect();
-    buildMinimalTable();
     loadDataFromServer();
 </script>
 </body>
