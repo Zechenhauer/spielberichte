@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Vergleich</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -28,7 +28,7 @@
             border: 1px solid var(--gold-dim);
             border-radius: 12px;
             padding: 30px;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
@@ -81,6 +81,15 @@
         }
         .save-btn:hover { opacity: 0.9; }
 
+        .compare-section {
+            margin-top: 40px;
+            background: rgba(0, 116, 217, 0.05);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .compare-section h3 { color: var(--accent-blue); font-family: 'Poppins'; margin-bottom: 15px; text-align: center; }
+
         .back-link {
             display: inline-block;
             margin-bottom: 15px;
@@ -95,7 +104,7 @@
 
 <div class="container">
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
-    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung (8 Einzel / 4 Doppel)</span></h2>
+    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Direktvergleich</span></h2>
     
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
@@ -109,7 +118,7 @@
 
     <div class="grid-4">
         <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
-        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1"></div>
+        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1" onchange="loadExistingAufstellung()"></div>
         <div class="form-group"><label>Liga</label><input type="text" id="liga" value="Bezirksklasse 05"></div>
         <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
     </div>
@@ -133,6 +142,24 @@
     </table>
 
     <button class="save-btn" onclick="saveMyAufstellung()">Aufstellung im Sheet speichern</button>
+
+    <!-- LIVE-VERGLEICH BERLEICH -->
+    <div class="compare-section">
+        <h3><i class="fa-solid fa-people-arrows"></i> Direktvergleich für Spieltag <span id="compareSpieltagLabel">1</span></h3>
+        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Hier siehst du im direkten Vergleich, was Jürgen und Markus eingetragen haben.</p>
+        <table id="compareTable">
+            <thead>
+                <tr>
+                    <th>Spiel</th>
+                    <th>Jürgen Schützendorf</th>
+                    <th>Markus Ginsel</th>
+                </tr>
+            </thead>
+            <tbody id="compareTableBody">
+                <tr><td colspan="3" style="text-align:center; color: var(--text-dim);">Lade Vergleichsdaten...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -141,6 +168,8 @@
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
     const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <span style="color:#fff;">${cleanUser}</span>`;
+
+    let globalServerData = null;
 
     const ourTeamRoster = [
         "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", 
@@ -190,16 +219,15 @@
 
         document.getElementById('datum').value = selectedOption.value;
         document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
+        document.getElementById('teamGast').value = selectedOption.dataset.team;
         
-        const opponent = selectedOption.dataset.team;
-        document.getElementById('teamGast').value = opponent;
+        loadExistingAufstellung();
     }
 
     function buildMinimalTable() {
         const tbody = document.getElementById('matchTableBody');
         tbody.innerHTML = '';
 
-        // Block 1: Einzel (1 - 8)
         const headerE = document.createElement('tr');
         headerE.innerHTML = `<td colspan="3" class="block-header">Block 1: Einzel (1 - 8)</td>`;
         tbody.appendChild(headerE);
@@ -208,7 +236,6 @@
             tbody.appendChild(createSingleRow(`Einzel ${i}`, i));
         }
 
-        // Block 2: Doppel (1 - 4)
         const headerD = document.createElement('tr');
         headerD.innerHTML = `<td colspan="3" class="block-header">Block 2: Doppel (1 - 4)</td>`;
         tbody.appendChild(headerD);
@@ -258,9 +285,95 @@
         return tr;
     }
 
+    async function loadDataFromServer() {
+        try {
+            let res = await fetch(GOOGLE_SCRIPT_URL);
+            globalServerData = await res.json();
+            loadExistingAufstellung();
+        } catch(e) {
+            console.error("Fehler beim Laden der Serverdaten:", e);
+        }
+    }
+
+    function loadExistingAufstellung() {
+        const currentSpieltag = document.getElementById('spieltagNummer').value;
+        document.getElementById('compareSpieltagLabel').innerText = currentSpieltag;
+
+        if (!globalServerData || !globalServerData.mfAufstellungen) return;
+
+        // Finde die Aufstellung des aktuell eingeloggten Users, um das Formular vorauszufüllen
+        const mySaved = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == currentSpieltag);
+        
+        if (mySaved && mySaved.payload && mySaved.payload.aufstellung) {
+            mySaved.payload.aufstellung.forEach((item, idx) => {
+                const i = idx + 1;
+                if (i <= 8) {
+                    const sel = document.getElementById(`heim_${i}`);
+                    if (sel) sel.value = item.heim || "";
+                    // Optional den Gegner füllen, falls dort was stand
+                } else {
+                    const parts = (item.heim || "").split(" & ");
+                    const selA = document.getElementById(`heim_${i}_a`);
+                    const selB = document.getElementById(`heim_${i}_b`);
+                    if (selA && parts[0]) selA.value = parts[0].trim();
+                    if (selB && parts[1]) selB.value = parts[1].trim();
+                }
+            });
+            if (mySaved.payload.gegner) document.getElementById('teamGast').value = mySaved.payload.gegner;
+        } else {
+            // Felder leeren, wenn noch nichts da ist
+            for(let i=1; i<=12; i++) {
+                if(i<=8) {
+                    let s = document.getElementById(`heim_${i}`); if(s) s.value="";
+                } else {
+                    let sa = document.getElementById(`heim_${i}_a`); if(sa) sa.value="";
+                    let sb = document.getElementById(`heim_${i}_b`); if(sb) sb.value="";
+                }
+            }
+        }
+
+        renderCompareTable(currentSpieltag);
+    }
+
+    function renderCompareTable(spieltag) {
+        const tbody = document.getElementById('compareTableBody');
+        tbody.innerHTML = '';
+
+        if (!globalServerData || !globalServerData.mfAufstellungen) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Keine Daten verfügbar</td></tr>`;
+            return;
+        }
+
+        const juergenRecord = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("jürgen") && a.spieltag == spieltag);
+        const markusRecord = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("markus") && a.spieltag == spieltag);
+
+        const jList = juergenRecord && juergenRecord.payload ? juergenRecord.payload.aufstellung : [];
+        const mList = markusRecord && markusRecord.payload ? markusRecord.payload.aufstellung : [];
+
+        for (let i = 0; i < 12; i++) {
+            const spielName = i < 8 ? `Einzel ${i+1}` : `Doppel ${i-7}`;
+            const jVal = jList[i] ? (jList[i].heim || "-") : "<i>Nicht eingetragen</i>";
+            const mVal = mList[i] ? (mList[i].heim || "-") : "<i>Nicht eingetragen</i>";
+
+            // Farbmarkierung bei Übereinstimmung
+            let rowStyle = "";
+            if (jList[i] && mList[i] && jList[i].heim && mList[i].heim && jList[i].heim === mList[i].heim) {
+                rowStyle = "background: rgba(16, 185, 129, 0.1);"; // zartes Grün bei Übereinstimmung
+            }
+
+            const tr = document.createElement('tr');
+            tr.style = rowStyle;
+            tr.innerHTML = `
+                <td><b>${spielName}</b></td>
+                <td>${jVal}</td>
+                <td>${mVal}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
     function saveMyAufstellung() {
         let matchData = [];
-        // 8 Einzel + 4 Doppel = 12 Spiele insgesamt
         for(let i = 1; i <= 12; i++) {
             if (i <= 8) {
                 matchData.push({
@@ -272,13 +385,14 @@
                 matchData.push({
                     spiel: `Doppel ${i-8}`,
                     heim: `${document.getElementById(`heim_${i}_a`).value} & ${document.getElementById(`heim_${i}_b`).value}`,
-                    gast: `${document.getElementById(`gast_${i}_a`).value} & ${document.getElementById(`gast_${i}_b`).value}`
+                    gast: `${document.getElementById(`gast_${i}_b`)?.value || ''}`
                 });
             }
         }
 
+        const currentSpieltag = document.getElementById('spieltagNummer').value;
         const payloadData = {
-            spieltag: document.getElementById('spieltagNummer').value,
+            spieltag: currentSpieltag,
             datum: document.getElementById('datum').value,
             gegner: document.getElementById('teamGast').value,
             aufstellung: matchData
@@ -287,17 +401,21 @@
         const url = new URL(GOOGLE_SCRIPT_URL);
         url.searchParams.append("action", "saveNwdvAufstellung");
         url.searchParams.append("spieler", cleanUser);
-        url.searchParams.append("spieltag", document.getElementById('spieltagNummer').value);
+        url.searchParams.append("spieltag", currentSpieltag);
         url.searchParams.append("payload", JSON.stringify(payloadData));
 
         const img = new Image();
         img.src = url.toString();
 
-        alert("Aufstellung für Spieltag " + document.getElementById('spieltagNummer').value + " erfolgreich gespeichert!");
+        alert("Aufstellung für Spieltag " + currentSpieltag + " erfolgreich gespeichert!");
+        
+        // Kurz warten, damit das Sheet den Eintrag verarbeitet hat, dann Daten neu laden
+        setTimeout(loadDataFromServer, 1500);
     }
 
     populateScheduleSelect();
     buildMinimalTable();
+    loadDataFromServer();
 </script>
 </body>
 </html>
