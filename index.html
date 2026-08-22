@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung & Finale Aufstellung</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -17,7 +17,6 @@
             --text-main: #e2e8f0;
             --text-dim: #94a3b8;
             --zusage: #10b981;
-            --absage: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,57 +59,29 @@
         th { background: rgba(255,255,255,0.03); color: var(--gold); font-family: 'Poppins'; text-transform: uppercase; font-size: 0.8rem; }
         
         .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 10px 15px; font-weight: bold; font-family: 'Poppins'; }
-        
         .double-selects { display: flex; gap: 5px; }
         .double-selects select { flex: 1; }
 
-        .save-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            background: var(--gold);
-            color: #000;
-            margin-top: 25px;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: opacity 0.2s;
-        }
+        .save-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 25px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
         .save-btn:hover { opacity: 0.9; }
 
-        .compare-section {
-            margin-top: 40px;
-            background: rgba(0, 116, 217, 0.05);
-            border: 1px solid var(--accent-blue);
-            border-radius: 12px;
-            padding: 20px;
-        }
+        .compare-section { margin-top: 40px; background: rgba(0, 116, 217, 0.05); border: 1px solid var(--accent-blue); border-radius: 12px; padding: 20px; }
         .compare-section h3 { color: var(--accent-blue); font-family: 'Poppins'; margin-bottom: 15px; text-align: center; }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
+        .back-link { display: inline-block; margin-bottom: 15px; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
         .back-link:hover { color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
+    <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
     <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung & Finale Aufstellung</span></h2>
     
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
-    <!-- Spieltag-Auswahl -->
     <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--gold-dim); border-radius: 8px;">
-        <label style="color: var(--gold);">Spieltag aus offiziellem Spielplan wählen</label>
+        <label style="color: var(--gold);">Spieltag wählen</label>
         <select id="scheduleSelect" onchange="applyScheduleSelection()">
             <option value="">-- Bitte Spieltag wählen --</option>
         </select>
@@ -128,47 +99,25 @@
     </div>
 
     <table>
-        <thead>
-            <tr>
-                <th style="width: 100px;">Spiel #</th>
-                <th>Heim Spieler (TV Kapellen 3)</th>
-            </tr>
-        </thead>
-        <tbody id="matchTableBody">
-            <!-- Wird dynamisch gefüllt -->
-        </tbody>
+        <thead><tr><th>Spiel #</th><th>Heim Spieler (TV Kapellen 3)</th></tr></thead>
+        <tbody id="matchTableBody"></tbody>
     </table>
 
     <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
 
-    <!-- DIREKTVERGLEICH & FINALE AUFSTELLUNG BEREICH -->
     <div class="compare-section">
-        <h3><i class="fa-solid fa-people-arrows"></i> Abgleich & Finale Aufstellung für Spieltag <span id="compareSpieltagLabel">1</span></h3>
-        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 15px;">Hier siehst du positionsgenau, wo ihr euch einig seid (grün markiert). In der rechten Spalte legst du die <b>Finale Aufstellung</b> fest.</p>
-        
+        <h3><i class="fa-solid fa-people-arrows"></i> Abgleich für Spieltag <span id="compareSpieltagLabel">1</span></h3>
         <table id="compareTable">
-            <thead>
-                <tr>
-                    <th>Spiel</th>
-                    <th>Jürgen (MF1)</th>
-                    <th>Markus (MF2)</th>
-                    <th style="background: var(--gold); color: #000;">FINALE AUFSTELLUNG</th>
-                </tr>
-            </thead>
-            <tbody id="compareTableBody">
-                <tr><td colspan="4" style="text-align:center; color: var(--text-dim);">Lade Vergleichsdaten...</td></tr>
-            </tbody>
+            <thead><tr><th>Spiel</th><th>Jürgen</th><th>Markus</th><th>FINALE AUFSTELLUNG</th></tr></thead>
+            <tbody id="compareTableBody"></tbody>
         </table>
 
-        <!-- Freigabe-Checkbox & Finaler Speicher-Button -->
         <div style="margin-top: 25px; background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
             <div>
-                <input type="checkbox" id="chk-public-visibility" style="transform: scale(1.4); accent-color: var(--gold); cursor: pointer; margin-right: 10px;">
-                <label for="chk-public-visibility" style="font-size: 1rem; font-weight: bold; color: var(--white); cursor: pointer; display:inline;">
-                    Finale Aufstellung für das ganze Team freigeben (Spalte 'Freigegeben' = TRUE)
-                </label>
+                <input type="checkbox" id="chk-public-visibility" style="transform: scale(1.4); margin-right: 10px;">
+                <label for="chk-public-visibility" style="color: var(--white); font-weight: bold; cursor: pointer;">Freigeben (TRUE)</label>
             </div>
-            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Finale Aufstellung speichern & freigeben</button>
+            <button class="save-btn" style="width: auto; margin-top: 0; padding: 12px 25px;" onclick="saveFinalAufstellungToSheet()">Speichern & Team-Freigabe</button>
         </div>
     </div>
 </div>
@@ -178,304 +127,126 @@
     
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
     const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
-    document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <span style="color:#fff;">${cleanUser}</span>`;
+    document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
 
     let globalServerData = null;
+    const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"];
 
-    const ourTeamRoster = [
-        "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", 
-        "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", 
-        "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
-    ];
-
-    const schedule = {
-        "2026-09-05": "TV Kapellen 1919 e.V. 2",
-        "2026-09-18": "DSC Goch 3",
-        "2026-09-25": "Rumelner TV 3",
-        "2026-10-10": "DSC Goch 4",
-        "2026-10-23": "Triple Inn Issum 2",
-        "2026-11-07": "SV Menzelen 1925",
-        "2026-11-13": "Die Wardter Darter",
-        "2026-11-27": "The Red Lions Xanten 1",
-        "2027-01-09": "Hart am Draht",
-        "2027-01-22": "TV Kapellen 1919 e.V. 2",
-        "2027-02-06": "DSC Goch 3",
-        "2027-02-19": "Rumelner TV 3",
-        "2027-03-05": "DSC Goch 4",
-        "2027-03-13": "Triple Inn Issum 2",
-        "2027-04-02": "SV Menzelen 1925",
-        "2027-04-24": "Die Wardter Darter",
-        "2027-05-08": "The Red Lions Xanten 1",
-        "2027-05-14": "Hart am Draht"
-    };
+    const schedule = {"2026-09-05":"TV Kapellen 1919 e.V. 2","2026-09-18":"DSC Goch 3","2026-09-25":"Rumelner TV 3","2026-10-10":"DSC Goch 4","2026-10-23":"Triple Inn Issum 2","2026-11-07":"SV Menzelen 1925","2026-11-13":"Die Wardter Darter","2026-11-27":"The Red Lions Xanten 1","2027-01-09":"Hart am Draht","2027-01-22":"TV Kapellen 1919 e.V. 2","2027-02-06":"DSC Goch 3","2027-02-19":"Rumelner TV 3","2027-03-05":"DSC Goch 4","2027-03-13":"Triple Inn Issum 2","2027-04-02":"SV Menzelen 1925","2027-04-24":"Die Wardter Darter","2027-05-08":"The Red Lions Xanten 1","2027-05-14":"Hart am Draht"};
 
     function populateScheduleSelect() {
-        const scheduleSelect = document.getElementById('scheduleSelect');
+        const select = document.getElementById('scheduleSelect');
         let index = 1;
         for (const [date, team] of Object.entries(schedule)) {
-            const option = document.createElement('option');
-            option.value = date;
-            option.dataset.spieltag = index;
-            option.dataset.team = team;
-            option.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
-            scheduleSelect.appendChild(option);
-            index++;
+            const opt = document.createElement('option');
+            opt.value = date; opt.dataset.spieltag = index;
+            opt.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
+            select.appendChild(opt); index++;
         }
     }
 
     function applyScheduleSelection() {
-        const scheduleSelect = document.getElementById('scheduleSelect');
-        const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
-        if (selectedOption && selectedOption.value) {
-            document.getElementById('datum').value = selectedOption.value;
-            document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
-        }
-
-        buildMinimalTable();
-        loadExistingAufstellung();
+        const opt = document.getElementById('scheduleSelect').options[document.getElementById('scheduleSelect').selectedIndex];
+        if(!opt.value) return;
+        document.getElementById('datum').value = opt.value;
+        document.getElementById('spieltagNummer').value = opt.dataset.spieltag;
+        buildMinimalTable(); loadExistingAufstellung();
     }
 
-    function getAbsagerForSpieltag(spieltagNummer) {
-        if (!globalServerData || !globalServerData.spieltage) return [];
-        const spiel = globalServerData.spieltage.find(s => s.id == spieltagNummer);
-        return spiel ? spiel.absagen : [];
+    function getAbsager(st) {
+        if(!globalServerData || !globalServerData.spieltage) return [];
+        const s = globalServerData.spieltage.find(x => x.id == st);
+        return s ? s.absagen : [];
     }
 
     function buildMinimalTable() {
         const tbody = document.getElementById('matchTableBody');
         tbody.innerHTML = '';
-
-        const headerE = document.createElement('tr');
-        headerE.innerHTML = `<td colspan="2" class="block-header">Block 1: Einzel (1 - 8)</td>`;
-        tbody.appendChild(headerE);
-
-        for(let i = 1; i <= 8; i++) {
-            tbody.appendChild(createSingleRow(`Einzel ${i}`, i));
-        }
-
-        const headerD = document.createElement('tr');
-        headerD.innerHTML = `<td colspan="2" class="block-header">Block 2: Doppel (1 - 4)</td>`;
-        tbody.appendChild(headerD);
-
-        for(let i = 1; i <= 4; i++) {
-            tbody.appendChild(createDoubleClickRow(`Doppel ${i}`, i + 8));
-        }
-    }
-
-    function createSingleRow(label, index) {
-        const tr = document.createElement('tr');
-        const currentSpieltag = document.getElementById('spieltagNummer').value;
-        const absager = getAbsagerForSpieltag(currentSpieltag);
-
-        let optionsHeim = '<option value="">-- Spieler wählen --</option>';
-        ourTeamRoster.forEach(p => { 
-            if (!absager.includes(p)) {
-                optionsHeim += `<option value="${p}">${p}</option>`; 
-            }
-        });
-
-        tr.innerHTML = `
-            <td><b>${label}</b></td>
-            <td><select id="heim_${index}">${optionsHeim}</select></td>
-        `;
-        return tr;
-    }
-
-    function createDoubleClickRow(label, index) {
-        const tr = document.createElement('tr');
-        const currentSpieltag = document.getElementById('spieltagNummer').value;
-        const absager = getAbsagerForSpieltag(currentSpieltag);
-
-        let optionsHeim1 = '<option value="">-- Spieler 1 --</option>';
-        let optionsHeim2 = '<option value="">-- Spieler 2 --</option>';
+        const st = document.getElementById('spieltagNummer').value;
+        const absager = getAbsager(st);
         
-        ourTeamRoster.forEach(p => { 
-            if (!absager.includes(p)) {
-                optionsHeim1 += `<option value="${p}">${p}</option>`;
-                optionsHeim2 += `<option value="${p}">${p}</option>`;
-            }
-        });
+        tbody.insertAdjacentHTML('beforeend', `<tr><td colspan="2" class="block-header">Block 1: Einzel (1-8)</td></tr>`);
+        for(let i=1; i<=8; i++) tbody.appendChild(createRow(i, absager, false));
+        tbody.insertAdjacentHTML('beforeend', `<tr><td colspan="2" class="block-header">Block 2: Doppel (1-4)</td></tr>`);
+        for(let i=1; i<=4; i++) tbody.appendChild(createRow(i+8, absager, true));
+    }
 
-        tr.innerHTML = `
-            <td><b>${label}</b></td>
-            <td>
-                <div class="double-selects">
-                    <select id="heim_${index}_a">${optionsHeim1}</select>
-                    <select id="heim_${index}_b">${optionsHeim2}</select>
-                </div>
-            </td>
-        `;
+    function createRow(idx, absager, isDouble) {
+        const tr = document.createElement('tr');
+        let opts = ourTeamRoster.filter(p => !absager.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
+        if(isDouble) {
+            tr.innerHTML = `<td><b>Doppel ${idx-8}</b></td><td><div class="double-selects"><select id="heim_${idx}_a">${opts}</select><select id="heim_${idx}_b">${opts}</select></div></td>`;
+        } else {
+            tr.innerHTML = `<td><b>Einzel ${idx}</b></td><td><select id="heim_${idx}">${opts}</select></td>`;
+        }
         return tr;
     }
 
     async function loadDataFromServer() {
-        try {
-            let res = await fetch(GOOGLE_SCRIPT_URL);
-            globalServerData = await res.json();
-            buildMinimalTable(); // Tabelle neu aufbauen, damit Absager greifen
-            loadExistingAufstellung();
-        } catch(e) {
-            console.error("Fehler beim Laden der Serverdaten:", e);
+        let res = await fetch(GOOGLE_SCRIPT_URL);
+        globalServerData = await res.json();
+        applyScheduleSelection();
+    }
+
+    function renderCompareTable(st) {
+        const tbody = document.getElementById('compareTableBody');
+        tbody.innerHTML = '';
+        const jList = (globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("jürgen") && a.spieltag == st)||{}).payload?.aufstellung || [];
+        const mList = (globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("markus") && a.spieltag == st)||{}).payload?.aufstellung || [];
+
+        for(let i=0; i<12; i++) {
+            const jV = jList[i]?.heim || "", mV = mList[i]?.heim || "";
+            const match = (jV && mV && jV === mV);
+            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8 ? 'E'+(i+1) : 'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td><input type="text" id="final_${i}" value="${match ? jV : ''}" style="width:100%; text-align:center; background:#000; color:#fff; border:1px solid var(--gold);"></td></tr>`;
         }
     }
 
     function loadExistingAufstellung() {
-        const currentSpieltag = document.getElementById('spieltagNummer').value;
-        document.getElementById('compareSpieltagLabel').innerText = currentSpieltag;
-
-        if (!globalServerData || !globalServerData.mfAufstellungen) return;
-
-        const mySaved = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == currentSpieltag);
-        
-        if (mySaved && mySaved.payload && mySaved.payload.aufstellung) {
-            mySaved.payload.aufstellung.forEach((item, idx) => {
-                const i = idx + 1;
-                if (i <= 8) {
-                    const sel = document.getElementById(`heim_${i}`);
-                    if (sel) sel.value = item.heim || "";
-                } else {
-                    const parts = (item.heim || "").split(" + ");
-                    const selA = document.getElementById(`heim_${i}_a`);
-                    const selB = document.getElementById(`heim_${i}_b`);
-                    if (selA && parts[0]) selA.value = parts[0].trim();
-                    if (selB && parts[1]) selB.value = parts[1].trim();
+        const st = document.getElementById('spieltagNummer').value;
+        const my = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase() === cleanUser.toLowerCase() && a.spieltag == st);
+        if(my?.payload?.aufstellung) {
+            my.payload.aufstellung.forEach((x, i) => {
+                const idx = i + 1;
+                if(idx <= 8) document.getElementById(`heim_${idx}`).value = x.heim;
+                else {
+                    const p = x.heim.split(" + ");
+                    document.getElementById(`heim_${idx}_a`).value = p[0];
+                    document.getElementById(`heim_${idx}_b`).value = p[1];
                 }
             });
-        } else {
-            for(let i=1; i<=12; i++) {
-                if(i<=8) {
-                    let s = document.getElementById(`heim_${i}`); if(s) s.value="";
-                } else {
-                    let sa = document.getElementById(`heim_${i}_a`); if(sa) sa.value="";
-                    let sb = document.getElementById(`heim_${i}_b`); if(sb) sb.value="";
-                }
-            }
         }
-
-        renderCompareTable(currentSpieltag);
-    }
-
-    function renderCompareTable(spieltag) {
-        const tbody = document.getElementById('compareTableBody');
-        tbody.innerHTML = '';
-
-        if (!globalServerData || !globalServerData.mfAufstellungen) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Keine Daten verfügbar</td></tr>`;
-            return;
-        }
-
-        const juergenRecord = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("jürgen") && a.spieltag == spieltag);
-        const markusRecord = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("markus") && a.spieltag == spieltag);
-
-        const jList = juergenRecord && juergenRecord.payload ? juergenRecord.payload.aufstellung : [];
-        const mList = markusRecord && markusRecord.payload ? markusRecord.payload.aufstellung : [];
-
-        for (let i = 0; i < 12; i++) {
-            const spielName = i < 8 ? `Einzel ${i+1}` : `Doppel ${i-7}`;
-            
-            const jVal = jList[i] ? (jList[i].heim || "") : "";
-            const mVal = mList[i] ? (mList[i].heim || "") : "";
-
-            const isMatch = (jVal !== "" && mVal !== "" && jVal === mVal);
-            const rowStyle = isMatch ? "background: rgba(16, 185, 129, 0.2); border-bottom: 2px solid var(--zusage);" : "";
-
-            let defaultFinalVal = isMatch ? jVal : "";
-
-            const tr = document.createElement('tr');
-            tr.style = rowStyle;
-            tr.innerHTML = `
-                <td><b>${spielName}</b></td>
-                <td>${jVal || "-"}</td>
-                <td>${mVal || "-"}</td>
-                <td style="background: rgba(212, 175, 55, 0.08);">
-                    <input type="text" id="final_input_${i+1}" value="${defaultFinalVal}" 
-                           placeholder="Finaler Spieler..." 
-                           style="width:100%; background: #000; border: 1px solid ${isMatch ? 'var(--zusage)' : 'var(--gold)'}; 
-                                  padding: 6px; border-radius: 4px; color: ${isMatch ? 'var(--zusage)' : '#fff'}; 
-                                  text-align: center; font-weight: bold;">
-                </td>
-            `;
-            tbody.appendChild(tr);
-        }
+        renderCompareTable(st);
     }
 
     function saveMyAufstellung() {
-        let matchData = [];
-        for(let i = 1; i <= 12; i++) {
-            if (i <= 8) {
-                matchData.push({
-                    spiel: `Einzel ${i}`,
-                    heim: document.getElementById(`heim_${i}`).value
-                });
-            } else {
-                matchData.push({
-                    spiel: `Doppel ${i-8}`,
-                    heim: `${document.getElementById(`heim_${i}_a`).value} + ${document.getElementById(`heim_${i}_b`).value}`
-                });
-            }
+        let list = [];
+        for(let i=1; i<=12; i++) {
+            list.push({spiel: i<=8 ? 'E'+i : 'D'+(i-8), heim: i<=8 ? document.getElementById('heim_'+i).value : document.getElementById('heim_'+i+'_a').value + ' + ' + document.getElementById('heim_'+i+'_b').value});
         }
-
-        const currentSpieltag = document.getElementById('spieltagNummer').value;
-        const payloadData = {
-            spieltag: currentSpieltag,
-            datum: document.getElementById('datum').value,
-            aufstellung: matchData
-        };
-
         const url = new URL(GOOGLE_SCRIPT_URL);
         url.searchParams.append("action", "saveNwdvAufstellung");
         url.searchParams.append("spieler", cleanUser);
-        url.searchParams.append("spieltag", currentSpieltag);
-        url.searchParams.append("payload", JSON.stringify(payloadData));
-
-        const img = new Image();
-        img.src = url.toString();
-
-        alert("Planung für Spieltag " + currentSpieltag + " gespeichert!");
-        setTimeout(loadDataFromServer, 1500);
+        url.searchParams.append("spieltag", document.getElementById('spieltagNummer').value);
+        url.searchParams.append("payload", JSON.stringify({aufstellung: list}));
+        new Image().src = url.toString();
+        alert("Planung gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
 
     function saveFinalAufstellungToSheet() {
-        const currentSpieltag = document.getElementById('spieltagNummer').value;
-        const rolle = cleanUser.toLowerCase().includes("jürgen") ? "MF1" : "MF2";
-        const isFreigegeben = document.getElementById('chk-public-visibility').checked;
-
-        let e1Arr = [];
-        let dArr = [];
-
-        for (let i = 1; i <= 8; i++) {
-            let val = document.getElementById(`final_input_${i}`).value.trim();
-            if (val && val !== "-") {
-                e1Arr.push(`${val} (E${i})`);
-            }
-        }
-
-        for (let i = 9; i <= 12; i++) {
-            let val = document.getElementById(`final_input_${i}`).value.trim();
-            let doppelNummer = i - 8;
-            if (val && val !== "-") {
-                dArr.push(`${val} (D${doppelNummer})`);
-            }
-        }
-
+        const st = document.getElementById('spieltagNummer').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
+        let e1 = [], d = [];
+        for(let i=0; i<8; i++) { let v = document.getElementById('final_'+i).value; if(v) e1.push(v + " (E"+(i+1)+")"); }
+        for(let i=8; i<12; i++) { let v = document.getElementById('final_'+i).value; if(v) d.push(v + " (D"+(i-7)+")"); }
         const url = new URL(GOOGLE_SCRIPT_URL);
         url.searchParams.append("action", "saveAufstellung");
-        url.searchParams.append("id", currentSpieltag);
-        url.searchParams.append("rolle", rolle);
-        url.searchParams.append("einzel1", e1Arr.join(", "));
-        url.searchParams.append("doppel", dArr.join(", "));
-        url.searchParams.append("einzel2", "");
-        url.searchParams.append("freigegeben", isFreigegeben);
-
-        const img = new Image();
-        img.src = url.toString();
-
-        alert(`Finale Aufstellung für Spieltag ${currentSpieltag} (${rolle}) erfolgreich gespeichert! Freigabestatus: ${isFreigegeben ? "SICHTBAR FÜRS TEAM (TRUE)" : "INTERN (FALSE)"}`);
-        setTimeout(loadDataFromServer, 1500);
+        url.searchParams.append("id", st); url.searchParams.append("rolle", rolle);
+        url.searchParams.append("einzel1", e1.join(", ")); url.searchParams.append("doppel", d.join(", "));
+        url.searchParams.append("freigegeben", document.getElementById('chk-public-visibility').checked);
+        new Image().src = url.toString();
+        alert("Finale Aufstellung gespeichert!"); setTimeout(loadDataFromServer, 1000);
     }
 
-    populateScheduleSelect();
-    loadDataFromServer();
+    populateScheduleSelect(); loadDataFromServer();
 </script>
 </body>
 </html>
