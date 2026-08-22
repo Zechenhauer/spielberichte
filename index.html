@@ -3,722 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NWDV Spielbericht Typ A - TV Kapellen 1919 e.V. 3</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #3b82f6;
-            --success: #22c55e;
-            --danger: #ef4444;
+            --navy: #050a14;
+            --gold: #D4AF37;
+            --gold-dim: rgba(212, 175, 55, 0.1);
+            --white: #ffffff;
+            --card-bg: #0c1626;
+            --accent-blue: #0074D9;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --zusage: #10b981;
+            --absage: #ef4444;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
+        
         .container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background-color: var(--navy);
+            border: 1px solid var(--gold-dim);
             border-radius: 12px;
-            padding: 25px;
+            padding: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; margin-top: 0; font-size: 1.8rem; margin-bottom: 20px; }
+        
+        .role-box {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--gold);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+            color: var(--gold);
+            font-size: 1.1rem;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 6px; color: white; font-size: 1rem; }
+        input:focus, select:focus { border-color: var(--gold); outline: none; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; font-size: 0.95rem; }
+        th { background: rgba(255,255,255,0.03); color: var(--gold); font-family: 'Poppins'; text-transform: uppercase; font-size: 0.8rem; }
+        
+        .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 10px 15px; font-weight: bold; font-family: 'Poppins'; }
+        
+        .save-btn {
             width: 100%;
-            max-width: 1150px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--gold);
+            color: #000;
+            margin-top: 25px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.2s;
         }
+        .save-btn:hover { opacity: 0.9; }
 
-        h2 { color: var(--accent); text-align: center; margin-top: 0; font-size: 1.5rem; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-        input, select { width: 100%; padding: 8px 10px; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: white; box-sizing: border-box; font-size: 0.9rem; }
-        input:focus, select:focus { outline: 1px solid var(--accent); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; table-layout: fixed; }
-        th, td { border: 1px solid var(--border-color); padding: 6px 4px; text-align: center; }
-        th { background: #0f172a; color: var(--accent); white-space: nowrap; }
-        
-        .score-container { display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .score-input { width: 42px !important; padding: 4px; text-align: center; font-weight: bold; font-size: 0.95rem; }
-        .pass-input { text-align: center; font-size: 0.8rem; }
-        
-        .running-score { font-weight: bold; color: var(--success); font-size: 0.95rem; }
-        .summary-row { background-color: #0f172a; font-weight: bold; color: var(--accent); }
-        .final-row { background-color: #1e3a8a; font-weight: bold; color: #ffffff; font-size: 1rem; }
-        
-        button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--success); color: white; margin-top: 20px; font-size: 1.05rem; }
-        button:hover { opacity: 0.9; }
-        .btn-blue { background: var(--accent); }
-        .btn-danger { background: var(--danger); }
-        .btn-secondary { background: #475569; }
-        .block-header { background: #334155; color: #fff; text-align: left; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
-        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
-
-        /* Optimierung für den PDF-Export / Druck (Erzwingt 1 DIN A4 Seite) */
-        @page {
-            size: A4 portrait;
-            margin: 6mm;
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
         }
-
-        @media print {
-            .no-print, button, hr {
-                display: none !important;
-            }
-            body {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                padding: 0 !important;
-                font-size: 10px !important;
-            }
-            .container {
-                background-color: #ffffff !important;
-                border: none !important;
-                box-shadow: none !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-            }
-            h2 {
-                color: #000000 !important;
-                font-size: 1.1rem !important;
-                margin-bottom: 4px !important;
-            }
-            .grid-2, .grid-4 {
-                gap: 4px !important;
-            }
-            .form-group {
-                margin-bottom: 3px !important;
-            }
-            label {
-                color: #333333 !important;
-                font-size: 0.6rem !important;
-                margin-bottom: 1px !important;
-            }
-            input, select {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                border: none !important;
-                border-bottom: 1px solid #000 !important;
-                border-radius: 0 !important;
-                padding: 1px 2px !important;
-                font-size: 0.75rem !important;
-                height: auto !important;
-                -webkit-appearance: none !important;
-                -moz-appearance: none !important;
-                appearance: none !important;
-            }
-
-            /* Spinner-Pfeile bei den Leg-Inputs im Druck ausblenden */
-            input[type=number]::-webkit-inner-spin-button, 
-            input[type=number]::-webkit-outer-spin-button { 
-                -webkit-appearance: none !important; 
-                margin: 0 !important; 
-            }
-            input[type=number] {
-                -moz-appearance: textfield !important;
-            }
-
-            table {
-                margin-top: 4px !important;
-                font-size: 0.72rem !important;
-            }
-            th, td {
-                border: 1px solid #000 !important;
-                padding: 1px 1px !important;
-                color: #000000 !important;
-            }
-            th {
-                background-color: #f1f5f9 !important;
-            }
-            .block-header {
-                background-color: #e2e8f0 !important;
-                color: #000000 !important;
-                padding: 2px 4px !important;
-                margin-top: 4px !important;
-                font-size: 0.75rem !important;
-            }
-            .summary-row, .final-row {
-                background-color: #f1f5f9 !important;
-                color: #000000 !important;
-            }
-            .running-score {
-                color: #000000 !important;
-            }
-            .score-input {
-                border: none !important;
-                width: 30px !important;
-                text-align: center !important;
-                font-weight: bold !important;
-            }
-
-            /* Ausgewählte Werte aus Dropdowns beim Druck als reinen Text anzeigen */
-            .print-val {
-                display: block !important;
-                font-weight: bold;
-                font-size: 0.75rem;
-            }
-            select.is-printed {
-                display: none !important;
-            }
-        }
+        .back-link:hover { color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>NWDV Ligaspielbericht "Typ A" - TV Kapellen 1919 e.V. 3</h2>
-
-    <!-- Archiv / Laden & Löschen Sektion -->
-    <div class="form-group no-print" style="background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-        <label style="color: var(--accent);">Gespeicherten Spielbericht ansehen / verwalten</label>
-        <div style="display:flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <select id="savedReportsSelect" onchange="loadSelectedReport()" style="flex: 1; min-width: 200px;">
-                <option value="">Lade gespeicherte Berichte...</option>
-            </select>
-            <button class="btn-blue" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="resetForm()">Neuer Bericht</button>
-            <button class="btn-danger" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="deleteReport()">Löschen</button>
-            <button class="btn-secondary" style="width: auto; margin-top: 0; white-space: nowrap;" onclick="triggerPrint()">Als PDF speichern / Drucken</button>
-        </div>
-    </div>
-
-    <hr class="no-print">
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zurück zum Haupt-Dashboard</a>
+    <h2>TV Kapellen 1919 e.V. 3<br><span style="font-size: 1.1rem; color: var(--text-dim);">MF Kaderplanung (8 Einzel / 4 Doppel)</span></h2>
     
-    <!-- Heim/Auswärts & Spieltag Auswahl -->
-    <div class="grid-2">
-        <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
-            <label style="color: var(--accent);">Spielart</label>
-            <select id="matchType" onchange="toggleHomeAway()">
-                <option value="Heimspiel" selected>Heimspiel</option>
-                <option value="Auswärts">Auswärtsspiel</option>
-            </select>
-        </div>
-        <div class="form-group" style="background: #1e293b; padding: 10px; border: 1px solid var(--accent); border-radius: 6px;">
-            <label style="color: var(--accent);">Spieltag Auswählen</label>
-            <select id="scheduleSelect" onchange="applyScheduleSelection()">
-                <option value="">-- Spieltag wählen --</option>
-            </select>
-        </div>
-    </div>
+    <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
-    <div class="grid-4">
-        <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
-        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltag" value="1"></div>
-        <div class="form-group"><label>Liga</label><input type="text" id="liga" value="Bezirksklasse 05"></div>
-        <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
-    </div>
-    
     <div class="grid-2">
-        <div class="form-group"><label id="labelTeamHeim">Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 1919 e.V. 3"></div>
         <div class="form-group">
-            <label id="labelTeamGast">Gastmannschaft</label>
-            <select id="teamGast" onchange="updateDropdownRosters()">
-                <option value="">-- Gegner wählen --</option>
-            </select>
+            <label>Spieltag Nummer</label>
+            <input type="number" id="spieltagNummer" value="1" min="1" max="22">
+        </div>
+        <div class="form-group">
+            <label>Gegnerische Mannschaft</label>
+            <input type="text" id="gegnerName" placeholder="z.B. DSC Goch 3">
         </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 25px;">#</th>
-                <th style="width: 75px;">Pass Heim</th>
-                <th>Heim Spieler</th>
-                <th style="width: 75px;">Pass Gast</th>
-                <th>Gast Spieler</th>
-                <th style="width: 85px;">Legs</th>
-                <th style="width: 75px;">Zw. Legs</th>
-                <th style="width: 75px;">Zw. Spiele</th>
+                <th style="width: 100px;">Spiel #</th>
+                <th>Heim Spieler (TV Kapellen 3)</th>
+                <th>Gast Spieler (Gegner)</th>
             </tr>
         </thead>
-        <tbody id="matchTableBody"></tbody>
+        <tbody id="matchTableBody">
+            <!-- Wird dynamisch gefüllt -->
+        </tbody>
     </table>
 
-    <div class="block-header">Bestleistungen</div>
-    <div class="grid-2" style="margin-top: 6px;">
-        <div class="form-group"><label>Highscore (180)</label><input type="text" id="blHighscore" placeholder="Spieler Name(n)"></div>
-        <div class="form-group"><label>Highfinish (100+)</label><input type="text" id="blHighfinish" placeholder="z.B. 120 (Max)"></div>
-        <div class="form-group"><label>Shortgame Einzel</label><input type="text" id="blShortEinzel" placeholder="z.B. 15 Darts"></div>
-        <div class="form-group"><label>Shortgame Doppel</label><input type="text" id="blShortDoppel" placeholder="z.B. 18 Darts"></div>
-    </div>
-
-    <button class="no-print" onclick="saveReport()">Spielbericht Speichern</button>
+    <button class="save-btn" onclick="saveMyAufstellung()">Aufstellung im Sheet speichern</button>
 </div>
 
 <script>
-    const SHEET_NAME = "TV Kapellen 3"; 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwvtL_L2Vk0k3WG2YnKGH271Vtqv36WGvzIPJYvXyiX5TuzEDb0qssKPz1Bcj9XmSsz/exec";
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
+    
+    // Holt den aktuell eingeloggten Benutzer aus dem localStorage
+    let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
+    const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
+    
+    document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <span style="color:#fff;">${cleanUser}</span>`;
 
-    const schedule = {
-        "2026-09-05": "TV Kapellen 1919 e.V. 2",
-        "2026-09-18": "DSC Goch 3",
-        "2026-09-25": "Rumelner TV 3",
-        "2026-10-10": "DSC Goch 4",
-        "2026-10-23": "Triple Inn Issum 2",
-        "2026-11-07": "SV Menzelen 1925",
-        "2026-11-13": "Die Wardter Darter",
-        "2026-11-27": "The Red Lions Xanten 1",
-        "2027-01-09": "Hart am Draht",
-        "2027-01-22": "TV Kapellen 1919 e.V. 2",
-        "2027-02-06": "DSC Goch 3",
-        "2027-02-19": "Rumelner TV 3",
-        "2027-03-05": "DSC Goch 4",
-        "2027-03-13": "Triple Inn Issum 2",
-        "2027-04-02": "SV Menzelen 1925",
-        "2027-04-24": "Die Wardter Darter",
-        "2027-05-08": "The Red Lions Xanten 1",
-        "2027-05-14": "Hart am Draht"
-    };
-
-    const opponentRosters = {
-        "DSC Goch 3": ["Lucas Keisers", "Patryk Tajdus", "Juri Lambert", "Jannik Lommen", "Manfred Michels", "Xavier Tomalla", "Björn Janssen", "Antoni Rolniczak", "Jonas Neiling", "Tim Knops", "Sven Stiebing", "Lennart Upmeyer", "Lukas Kerst", "Sebastian Wouters", "Linus Kerst", "Michael Loock"],
-        "DSC Goch 4": ["Jens Robert Michels", "Ben Schweidler", "Patrick Thellmann", "Andreas Geurtsen", "Alexander Schmidt", "Mario van Elst", "Melanie Zwanziger", "Kevin van Elst", "Tobias Klamp", "Hans Günther Seidl", "Marco Hofkens", "Maximilian Henn", "Jörg Hillmann", "Michael Schweidler", "Hans-Jürgen Otto", "Adrian Hoppe", "Justus Kilzer", "Holger Stayen", "Niklas Krämer"],
-        "Die Wardter Darter": ["Alexander Reis", "Narayan Amanupunnjo", "Marvin Loth", "Ralf Graumann", "Christian Dederle", "Daniel Venhoff", "Marius Bußmann", "Rainer Staymann", "Martin Wegner", "Timo von Scheidt", "André Kaufels"],
-        "Hart am Draht": ["Ann-Kathrin Brugmann", "Justin Schraven", "Leandro Wessiepe", "Pierre Lohmann", "Marius Hergesell", "Kevin Haßheider", "Henning Felder", "Annkathrin Wanders", "Saskia Husmann", "Benjamin Borgards", "Philipp-Sascha Brugmann", "Stefan Borgards", "Marco Inghilleri", "Melanie Bendriss", "Manuela Weis", "Robin Weis", "Michael Ganther", "Thomas Zygar"],
-        "Rumelner TV 3": ["Michaela von Dahlen", "Christian Krause", "Stefan Eilbrecht", "Sebastian Pohl", "Pierre von Dahlen", "Marvin Fünfstück", "Valentin De Spirt", "Alexander Wahl", "Melanie Drees", "Mike Küffen", "Sam von Dahlen", "Sascha Schütte"],
-        "SV Menzelen 1925": ["Iris Reimer", "Julian Keisers", "Erich Janik", "Martin Haberstroh", "Johannes Wynen", "Thomas Kiwitt", "Robert Giesen", "Christoph Luschgy", "Tanja Wynen", "Sven Krams", "Stephan Kempkes", "Daniel Kempkes", "Markus Reimer"],
-        "TV Kapellen 1919 e.V. 2": ["Philip Möller", "Markus Thiele", "Danny Voß", "Daniel Simanowitz", "Christian Schreiber", "Dominik Herz", "Markus Elgersma", "Thomas Franzen"],
-        "The Red Lions Xanten 1": ["Sebastian ALosery", "Jan Pötters", "Stephan Reintges", "Raphael Wefers", "Kai Maas", "Dustin Stenzel", "Tobias Reintges", "Björn Hesse"],
-        "Triple Inn Issum 2": ["Lukas Helmes", "Sarah Hillejan", "Simon Hillejan", "Thomas Liebenow", "Marcel Angenendt", "Hans-Willi Hollick", "Joshua Jäschke", "Stefan Hanauer", "Michael Heinen", "Stefan Klein", "Christoph Passens", "Karl-Heinz Grimm", "Daniel Moschüring", "Michael Delbeck", "Sascha Rudies"]
-    };
-
-    const myTeamRoster = [
-        "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
+    const ourTeamRoster = [
+        "Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", 
+        "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", 
+        "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
     ];
 
-    const totalMatches = 20;
-    let allReports = [];
-
-    function initForm() {
-        populateScheduleSelect();
-        populateGastTeamsSelect();
-        buildTable();
-        loadReportsFromSheet();
-    }
-
-    function triggerPrint() {
-        // Wandelt ausgewählte Dropdown-Optionen vor dem Drucken temporär in Lesetext um
-        const selects = document.querySelectorAll('select:not(.no-print)');
-        selects.forEach(sel => {
-            const selectedText = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
-            if (selectedText && !selectedText.startsWith('--')) {
-                const printSpan = document.createElement('span');
-                printSpan.className = 'print-val';
-                printSpan.textContent = selectedText;
-                sel.parentNode.appendChild(printSpan);
-                sel.classList.add('is-printed');
-            }
-        });
-
-        window.print();
-
-        // Stellt den Normalzustand wieder her
-        document.querySelectorAll('.print-val').forEach(el => el.remove());
-        document.querySelectorAll('select.is-printed').forEach(el => el.classList.remove('is-printed'));
-    }
-
-    function populateScheduleSelect() {
-        const scheduleSelect = document.getElementById('scheduleSelect');
-        let index = 1;
-        for (const [date, team] of Object.entries(schedule)) {
-            const option = document.createElement('option');
-            option.value = date;
-            option.dataset.spieltag = index;
-            option.dataset.team = team;
-            option.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
-            scheduleSelect.appendChild(option);
-            index++;
-        }
-    }
-
-    function populateGastTeamsSelect() {
-        const teamGastSelect = document.getElementById('teamGast');
-        teamGastSelect.innerHTML = '<option value="">-- Gegner wählen --</option>';
-        for (const team of Object.keys(opponentRosters)) {
-            const option = document.createElement('option');
-            option.value = team;
-            option.textContent = team;
-            teamGastSelect.appendChild(option);
-        }
-    }
-
-    function toggleHomeAway() {
-        const isAway = document.getElementById('matchType').value === "Auswärts";
-        const scheduleSelect = document.getElementById('scheduleSelect');
-        const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
-        
-        const selectedOpponent = selectedOption?.dataset?.team || document.getElementById('teamGast').value;
-        const ownTeam = "TV Kapellen 1919 e.V. 3";
-
-        const teamHeimInput = document.getElementById('teamHeim');
-        const teamGastSelect = document.getElementById('teamGast');
-
-        if (isAway) {
-            teamHeimInput.value = (selectedOpponent && selectedOpponent !== ownTeam) ? selectedOpponent : "Gegner wählen";
-            
-            if (!Array.from(teamGastSelect.options).some(opt => opt.value === ownTeam)) {
-                const opt = document.createElement('option');
-                opt.value = ownTeam;
-                opt.textContent = ownTeam;
-                teamGastSelect.appendChild(opt);
-            }
-            teamGastSelect.value = ownTeam;
-            document.getElementById('spielort').value = "Auswärts";
-        } else {
-            teamHeimInput.value = ownTeam;
-            
-            populateGastTeamsSelect();
-            if (selectedOpponent && selectedOpponent !== ownTeam) {
-                teamGastSelect.value = selectedOpponent;
-            }
-            document.getElementById('spielort').value = "Jugendzentrum Henri";
-        }
-        
-        updateDropdownRosters();
-    }
-
-    function applyScheduleSelection() {
-        const scheduleSelect = document.getElementById('scheduleSelect');
-        const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
-        
-        if (!selectedOption.value) return;
-
-        document.getElementById('datum').value = selectedOption.value;
-        document.getElementById('spieltag').value = selectedOption.dataset.spieltag;
-        
-        const opponent = selectedOption.dataset.team;
-        const isAway = document.getElementById('matchType').value === "Auswärts";
-
-        if (isAway) {
-            document.getElementById('teamHeim').value = opponent;
-        } else {
-            document.getElementById('teamGast').value = opponent;
-        }
-
-        toggleHomeAway();
-    }
-
-    function buildTable() {
+    function buildMinimalTable() {
         const tbody = document.getElementById('matchTableBody');
         tbody.innerHTML = '';
 
-        for (let i = 1; i <= totalMatches; i++) {
-            if (i === 1) addBlockHeader(tbody, "Block 1: Einzel (1 - 8)");
-            
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${i}</b></td>
-                <td><input type="text" class="pass-input" id="passHeim_${i}" placeholder="Pass"></td>
-                <td><select id="pHeim_${i}"><option value="">-- Spieler --</option></select></td>
-                <td><input type="text" class="pass-input" id="passGast_${i}" placeholder="Pass"></td>
-                <td><select id="pGast_${i}"><option value="">-- Spieler --</option></select></td>
-                <td>
-                    <div class="score-container">
-                        <input type="number" class="score-input" id="lHeim_${i}" min="0" oninput="calculateScores()">
-                        <span>:</span>
-                        <input type="number" class="score-input" id="lGast_${i}" min="0" oninput="calculateScores()">
-                    </div>
-                </td>
-                <td class="running-score" id="zsLegs_${i}">-</td>
-                <td class="running-score" id="zsSpstd_${i}">-</td>
-            `;
-            tbody.appendChild(tr);
+        // Block 1: Einzel (1 - 8)
+        const headerE = document.createElement('tr');
+        headerE.innerHTML = `<td colspan="3" class="block-header">Block 1: Einzel (1 - 8)</td>`;
+        tbody.appendChild(headerE);
 
-            if (i === 8) {
-                addSummaryRow(tbody, "zwischenstand_block1", "Zwischenstand nach Einzel Block 1 (Spiele 1-8)");
-                addBlockHeader(tbody, "Block 2: Doppel (9 - 12)");
-            }
-            if (i === 12) {
-                addSummaryRow(tbody, "zwischenstand_block2", "Zwischenstand nach Doppel Block 2 (Spiele 1-12)");
-                addBlockHeader(tbody, "Block 3: Einzel (13 - 20)");
-            }
-            if (i === 20) {
-                addSummaryRow(tbody, "endstand_block3", "ENDSTAND (Spiele 1-20)", true);
-            }
+        for(let i = 1; i <= 8; i++) {
+            tbody.appendChild(createRow(`Einzel ${i}`, i));
         }
-        updateDropdownRosters();
+
+        // Block 2: Doppel (1 - 4)
+        const headerD = document.createElement('tr');
+        headerD.innerHTML = `<td colspan="3" class="block-header">Block 2: Doppel (1 - 4)</td>`;
+        tbody.appendChild(headerD);
+
+        for(let i = 1; i <= 4; i++) {
+            tbody.appendChild(createRow(`Doppel ${i}`, i + 8));
+        }
     }
 
-    function addBlockHeader(tbody, text) {
+    function createRow(label, index) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="8" class="block-header" style="background:#1e293b; text-align:left; font-weight:bold; color:#3b82f6;">${text}</td>`;
-        tbody.appendChild(tr);
-    }
-
-    function addSummaryRow(tbody, idPrefix, title, isFinal = false) {
-        const tr = document.createElement('tr');
-        tr.className = isFinal ? "final-row" : "summary-row";
-        tr.innerHTML = `
-            <td colspan="5" style="text-align:right; padding-right:15px;">${title}:</td>
-            <td id="${idPrefix}_legs">-</td>
-            <td colspan="2" id="${idPrefix}_spiele">-</td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    function updateDropdownRosters() {
-        const isAway = document.getElementById('matchType').value === "Auswärts";
-        let opponentName = "";
-
-        if (isAway) {
-            opponentName = document.getElementById('teamHeim').value;
-        } else {
-            opponentName = document.getElementById('teamGast').value;
-        }
-
-        const opponentRoster = opponentRosters[opponentName] || [];
-
-        const heimRoster = isAway ? opponentRoster : myTeamRoster;
-        const gastRoster = isAway ? myTeamRoster : opponentRoster;
-
-        for (let i = 1; i <= totalMatches; i++) {
-            populateSelect(document.getElementById(`pHeim_${i}`), heimRoster);
-            populateSelect(document.getElementById(`pGast_${i}`), gastRoster);
-        }
-    }
-
-    function populateSelect(selectEl, roster) {
-        if (!selectEl) return;
-        const currVal = selectEl.value;
-        selectEl.innerHTML = '<option value="">-- Spieler wählen --</option>';
-        roster.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p;
-            opt.textContent = p;
-            selectEl.appendChild(opt);
-        });
-        if (roster.includes(currVal)) selectEl.value = currVal;
-    }
-
-    function calculateScores() {
-        let cumHeimLegs = 0, cumGastLegs = 0;
-        let cumHeimGames = 0, cumGastGames = 0;
-
-        for (let i = 1; i <= totalMatches; i++) {
-            const hLegsVal = document.getElementById(`lHeim_${i}`).value;
-            const gLegsVal = document.getElementById(`lGast_${i}`).value;
-
-            if (hLegsVal !== '' && gLegsVal !== '') {
-                const hLegs = parseInt(hLegsVal, 10) || 0;
-                const gLegs = parseInt(gLegsVal, 10) || 0;
-
-                cumHeimLegs += hLegs;
-                cumGastLegs += gLegs;
-
-                if (hLegs > gLegs) cumHeimGames += 1;
-                else if (gLegs > hLegs) cumGastGames += 1;
-
-                document.getElementById(`zsLegs_${i}`).textContent = `${cumHeimLegs} : ${cumGastLegs}`;
-                document.getElementById(`zsSpstd_${i}`).textContent = `${cumHeimGames} : ${cumGastGames}`;
-            } else {
-                document.getElementById(`zsLegs_${i}`).textContent = `-`;
-                document.getElementById(`zsSpstd_${i}`).textContent = `-`;
-            }
-
-            if (i === 8) {
-                document.getElementById('zwischenstand_block1_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
-                document.getElementById('zwischenstand_block1_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
-            }
-            if (i === 12) {
-                document.getElementById('zwischenstand_block2_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
-                document.getElementById('zwischenstand_block2_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
-            }
-            if (i === 20) {
-                document.getElementById('endstand_block3_legs').textContent = `${cumHeimLegs} : ${cumGastLegs}`;
-                document.getElementById('endstand_block3_spiele').textContent = `${cumHeimGames} : ${cumGastGames}`;
-            }
-        }
-    }
-
-    async function loadReportsFromSheet() {
-        const selectEl = document.getElementById('savedReportsSelect');
-        try {
-            const res = await fetch(WEB_APP_URL);
-            allReports = await res.json();
-
-            selectEl.innerHTML = '<option value="">-- Spielbericht auswählen zum Ansehen --</option>';
-
-            if (allReports && allReports.length > 0) {
-                allReports.forEach((report, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    const d = report.datum ? report.datum.substring(0, 10) : 'Kein Datum';
-                    const score = (report.endstandSpiele && report.endstandSpiele !== 'undefined') ? report.endstandSpiele : '-:-';
-                    option.textContent = `Spieltag ${report.spieltag} (${d}): ${report.heim} vs. ${report.gast} (${score})`;
-                    selectEl.appendChild(option);
-                });
-            } else {
-                selectEl.innerHTML = '<option value="">Keine gespeicherten Berichte vorhanden</option>';
-            }
-        } catch (e) {
-            console.error("Fehler beim Laden:", e);
-            selectEl.innerHTML = '<option value="">Fehler beim Laden der Berichte</option>';
-        }
-    }
-
-    function loadSelectedReport() {
-        const idx = document.getElementById('savedReportsSelect').value;
-        if (idx === "") return;
-
-        const report = allReports[idx];
-        if (!report) return;
-
-        if (report.datum) document.getElementById('datum').value = report.datum.substring(0, 10);
-        document.getElementById('spieltag').value = report.spieltag || 1;
-        document.getElementById('liga').value = report.liga || '';
-        document.getElementById('spielort').value = report.spielort || '';
-        document.getElementById('teamHeim').value = report.heim || '';
-        document.getElementById('teamGast').value = report.gast || '';
-
-        updateDropdownRosters();
-
-        if (report.matches && report.matches.length > 0) {
-            report.matches.forEach((m, index) => {
-                const i = index + 1;
-                document.getElementById(`passHeim_${i}`).value = m.passHeim || '';
-                document.getElementById(`pHeim_${i}`).value = m.pHeim || '';
-                document.getElementById(`passGast_${i}`).value = m.passGast || '';
-                document.getElementById(`pGast_${i}`).value = m.pGast || '';
-                document.getElementById(`lHeim_${i}`).value = m.lHeim || '';
-                document.getElementById(`lGast_${i}`).value = m.lGast || '';
-            });
-            calculateScores();
-        }
-
-        if (report.bestleistungen) {
-            document.getElementById('blHighscore').value = report.bestleistungen.highscore || '';
-            document.getElementById('blHighfinish').value = report.bestleistungen.highfinish || '';
-            document.getElementById('blShortEinzel').value = report.bestleistungen.shortEinzel || '';
-            document.getElementById('blShortDoppel').value = report.bestleistungen.shortDoppel || '';
-        }
-    }
-
-    function resetForm() {
-        document.getElementById('savedReportsSelect').value = '';
-        document.getElementById('scheduleSelect').value = '';
-        document.getElementById('matchType').value = 'Heimspiel';
-        document.getElementById('datum').value = '';
-        document.getElementById('spieltag').value = '1';
-        document.getElementById('spielort').value = 'Jugendzentrum Henri';
-        document.getElementById('liga').value = 'Bezirksklasse 05';
         
-        populateGastTeamsSelect();
-        toggleHomeAway();
+        let optionsHeim = '<option value="">-- Unser Spieler wählen --</option>';
+        ourTeamRoster.forEach(p => { optionsHeim += `<option value="${p}">${p}</option>`; });
 
-        for (let i = 1; i <= totalMatches; i++) {
-            document.getElementById(`passHeim_${i}`).value = '';
-            document.getElementById(`pHeim_${i}`).value = '';
-            document.getElementById(`passGast_${i}`).value = '';
-            document.getElementById(`pGast_${i}`).value = '';
-            document.getElementById(`lHeim_${i}`).value = '';
-            document.getElementById(`lGast_${i}`).value = '';
-        }
-
-        document.getElementById('blHighscore').value = '';
-        document.getElementById('blHighfinish').value = '';
-        document.getElementById('blShortEinzel').value = '';
-        document.getElementById('blShortDoppel').value = '';
-
-        calculateScores();
+        tr.innerHTML = `
+            <td><b>${label}</b></td>
+            <td><select id="heim_${index}">${optionsHeim}</select></td>
+            <td><input type="text" id="gast_${index}" placeholder="Name des Gegners"></td>
+        `;
+        return tr;
     }
 
-    function saveReport() {
-        let matches = [];
-        for (let i = 1; i <= totalMatches; i++) {
-            matches.push({
-                nr: i,
-                passHeim: document.getElementById(`passHeim_${i}`).value,
-                pHeim: document.getElementById(`pHeim_${i}`).value,
-                passGast: document.getElementById(`passGast_${i}`).value,
-                pGast: document.getElementById(`pGast_${i}`).value,
-                lHeim: document.getElementById(`lHeim_${i}`).value,
-                lGast: document.getElementById(`lGast_${i}`).value,
-                zsLegs: document.getElementById(`zsLegs_${i}`).textContent,
-                zsSpstd: document.getElementById(`zsSpstd_${i}`).textContent
+    function saveMyAufstellung() {
+        let matchData = [];
+        // 8 Einzel + 4 Doppel = 12 Spiele insgesamt
+        for(let i = 1; i <= 12; i++) {
+            matchData.push({
+                spiel: i <= 8 ? `Einzel ${i}` : `Doppel ${i-8}`,
+                heim: document.getElementById(`heim_${i}`).value,
+                gast: document.getElementById(`gast_${i}`).value
             });
         }
 
-        const payload = {
-            sheetName: SHEET_NAME,
-            action: "saveNwdvReport",
-            head: {
-                datum: document.getElementById('datum').value,
-                spieltag: document.getElementById('spieltag').value,
-                liga: document.getElementById('liga').value,
-                spielort: document.getElementById('spielort').value,
-                heim: document.getElementById('teamHeim').value,
-                gast: document.getElementById('teamGast').value
-            },
-            finalScore: document.getElementById('endstand_block3_spiele').textContent,
-            finalLegs: document.getElementById('endstand_block3_legs').textContent,
-            bestleistungen: {
-                highscore: document.getElementById('blHighscore').value,
-                highfinish: document.getElementById('blHighfinish').value,
-                shortEinzel: document.getElementById('blShortEinzel').value,
-                shortDoppel: document.getElementById('blShortDoppel').value
-            },
-            matches: matches
+        const payloadData = {
+            spieltag: document.getElementById('spieltagNummer').value,
+            gegner: document.getElementById('gegnerName').value,
+            aufstellung: matchData
         };
 
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            alert("Spielbericht erfolgreich übermittelt und ins Sheet eingetragen!");
-            setTimeout(loadReportsFromSheet, 2000);
-        }).catch(err => {
-            console.error("Fehler beim Speichern:", err);
-            alert("Fehler beim Übermitteln des Spielberichts.");
-        });
+        // Übertragung via Image-Hack (GET-Parameter), um jegliche CORS/Redirect-Blockaden zu umgehen
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        url.searchParams.append("action", "saveNwdvAufstellung");
+        url.searchParams.append("spieler", cleanUser);
+        url.searchParams.append("spieltag", document.getElementById('spieltagNummer').value);
+        url.searchParams.append("payload", JSON.stringify(payloadData));
+
+        const img = new Image();
+        img.src = url.toString();
+
+        alert("Aufstellung für Spieltag " + document.getElementById('spieltagNummer').value + " wurde erfolgreich an das Google Sheet gesendet!");
     }
 
-    function deleteReport() {
-        const selectEl = document.getElementById('savedReportsSelect');
-        const idx = selectEl.value;
-
-        if (idx === "") {
-            alert("Bitte wähle zuerst einen Spielbericht aus, den du löschen möchtest.");
-            return;
-        }
-
-        const report = allReports[idx];
-        const confirmDelete = confirm(`Möchtest du den Spielbericht wirklich löschen?\n\nSpieltag ${report.spieltag}: ${report.heim} vs. ${report.gast}`);
-
-        if (!confirmDelete) return;
-
-        const payload = {
-            sheetName: SHEET_NAME,
-            action: "deleteNwdvReport",
-            rowIndex: parseInt(idx, 10)
-        };
-
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            alert("Spielbericht erfolgreich gelöscht!");
-            resetForm();
-            setTimeout(loadReportsFromSheet, 1500);
-        }).catch(err => {
-            console.error("Fehler beim Löschen:", err);
-            alert("Fehler beim Löschen des Berichts.");
-        });
-    }
-
-    initForm();
+    buildMinimalTable();
 </script>
 </body>
 </html>
