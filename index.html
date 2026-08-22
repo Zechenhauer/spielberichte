@@ -13,12 +13,10 @@
         h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
         .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 12px; text-align: center; margin-bottom: 25px; font-size: 1.1rem; color: var(--gold); font-weight: bold; }
         
-        /* Große Tabelle */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0c1626; border-radius: 8px; font-size: 1.1rem; }
         th, td { border: 1px solid rgba(255,255,255,0.1); padding: 18px; text-align: center; }
         th { background: rgba(255,255,255,0.05); color: var(--gold); font-size: 1rem; text-transform: uppercase; }
         
-        /* Große Dropdowns */
         select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; margin: 4px 0; }
         .double-selects { display: flex; gap: 8px; }
         .double-selects select { flex: 1; }
@@ -26,7 +24,6 @@
         .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 30px; font-size: 1.2rem; text-transform: uppercase; }
         .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 1rem; }
 
-        /* Chat Sektion */
         .chat-section { margin-top: 50px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); padding: 25px; border-radius: 12px; }
         .chat-box { height: 220px; background: #000; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; margin-bottom: 15px; font-size: 1rem; display: flex; flex-direction: column; gap: 10px; }
         .chat-msg { background: rgba(212, 175, 55, 0.08); padding: 10px 14px; border-radius: 6px; border-left: 3px solid var(--gold); }
@@ -61,7 +58,6 @@
         </div>
     </div>
 
-    <!-- Chat Bereich -->
     <div class="chat-section">
         <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size: 1.5rem;"><i class="fa-solid fa-comments"></i> MF Absprache-Chat</h3>
         <div class="chat-box" id="chatContainer">
@@ -126,17 +122,19 @@
         
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
+            
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<div class="double-selects"><select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select></div>`;
             
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
             
             if(match) {
-                if(i<8) {
-                    document.getElementById('f'+i).value = jV;
+                if(i < 8) {
+                    let sel = document.getElementById('f' + i);
+                    if(sel) sel.value = jV;
                 } else { 
                     let p = jV.split(" + "); 
-                    let sA = document.getElementById('f'+i+'a');
-                    let sB = document.getElementById('f'+i+'b');
+                    let sA = document.getElementById('f' + i + 'a');
+                    let sB = document.getElementById('f' + i + 'b');
                     if(sA && p[0]) sA.value = p[0].trim(); 
                     if(sB && p[1]) sB.value = p[1].trim(); 
                 }
@@ -165,7 +163,6 @@
         renderCompareTable(st);
     }
 
-    // Chat Rendering
     function renderChat() {
         const chatBox = document.getElementById('chatContainer');
         chatBox.innerHTML = '';
@@ -194,7 +191,6 @@
         
         new Image().src = url.toString();
         
-        // Sofort lokal anzeigen
         const chatBox = document.getElementById('chatContainer');
         if(chatBox.innerHTML.includes("Noch keine Nachrichten")) chatBox.innerHTML = '';
         const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
