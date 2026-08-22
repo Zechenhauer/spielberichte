@@ -28,7 +28,7 @@
             border: 1px solid var(--gold-dim);
             border-radius: 12px;
             padding: 30px;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
@@ -48,18 +48,22 @@
         }
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
         
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 1px; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 6px; color: white; font-size: 1rem; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 6px; color: white; font-size: 0.95rem; }
         input:focus, select:focus { border-color: var(--gold); outline: none; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; font-size: 0.95rem; }
+        th, td { border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: center; font-size: 0.9rem; }
         th { background: rgba(255,255,255,0.03); color: var(--gold); font-family: 'Poppins'; text-transform: uppercase; font-size: 0.8rem; }
         
         .block-header { background: rgba(212, 175, 55, 0.15); color: var(--gold); text-align: left; padding: 10px 15px; font-weight: bold; font-family: 'Poppins'; }
         
+        .double-selects { display: flex; gap: 5px; }
+        .double-selects select { flex: 1; }
+
         .save-btn {
             width: 100%;
             padding: 15px;
@@ -95,15 +99,24 @@
     
     <div class="role-box" id="roleDisplay">Eingeloggt als: Lade...</div>
 
+    <!-- Spieltag-Auswahl -->
+    <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--gold-dim); border-radius: 8px;">
+        <label style="color: var(--gold);">Spieltag aus offiziellem Spielplan wählen</label>
+        <select id="scheduleSelect" onchange="applyScheduleSelection()">
+            <option value="">-- Bitte Spieltag wählen --</option>
+        </select>
+    </div>
+
+    <div class="grid-4">
+        <div class="form-group"><label>Datum</label><input type="date" id="datum"></div>
+        <div class="form-group"><label>Spieltag</label><input type="number" id="spieltagNummer" value="1"></div>
+        <div class="form-group"><label>Liga</label><input type="text" id="liga" value="Bezirksklasse 05"></div>
+        <div class="form-group"><label>Spielort</label><input type="text" id="spielort" value="Jugendzentrum Henri"></div>
+    </div>
+    
     <div class="grid-2">
-        <div class="form-group">
-            <label>Spieltag Nummer</label>
-            <input type="number" id="spieltagNummer" value="1" min="1" max="22">
-        </div>
-        <div class="form-group">
-            <label>Gegnerische Mannschaft</label>
-            <input type="text" id="gegnerName" placeholder="z.B. DSC Goch 3">
-        </div>
+        <div class="form-group"><label>Heimmannschaft</label><input type="text" id="teamHeim" value="TV Kapellen 1919 e.V. 3"></div>
+        <div class="form-group"><label>Gastmannschaft (Gegner)</label><input type="text" id="teamGast" placeholder="Gegner"></div>
     </div>
 
     <table>
@@ -125,10 +138,8 @@
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
     
-    // Holt den aktuell eingeloggten Benutzer aus dem localStorage
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
     const cleanUser = currentUser.replace(' (TC 1)', '').replace(' (MF1)', '').replace(' (MF2)', '').trim();
-    
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <span style="color:#fff;">${cleanUser}</span>`;
 
     const ourTeamRoster = [
@@ -136,6 +147,53 @@
         "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", 
         "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"
     ];
+
+    const schedule = {
+        "2026-09-05": "TV Kapellen 1919 e.V. 2",
+        "2026-09-18": "DSC Goch 3",
+        "2026-09-25": "Rumelner TV 3",
+        "2026-10-10": "DSC Goch 4",
+        "2026-10-23": "Triple Inn Issum 2",
+        "2026-11-07": "SV Menzelen 1925",
+        "2026-11-13": "Die Wardter Darter",
+        "2026-11-27": "The Red Lions Xanten 1",
+        "2027-01-09": "Hart am Draht",
+        "2027-01-22": "TV Kapellen 1919 e.V. 2",
+        "2027-02-06": "DSC Goch 3",
+        "2027-02-19": "Rumelner TV 3",
+        "2027-03-05": "DSC Goch 4",
+        "2027-03-13": "Triple Inn Issum 2",
+        "2027-04-02": "SV Menzelen 1925",
+        "2027-04-24": "Die Wardter Darter",
+        "2027-05-08": "The Red Lions Xanten 1",
+        "2027-05-14": "Hart am Draht"
+    };
+
+    function populateScheduleSelect() {
+        const scheduleSelect = document.getElementById('scheduleSelect');
+        let index = 1;
+        for (const [date, team] of Object.entries(schedule)) {
+            const option = document.createElement('option');
+            option.value = date;
+            option.dataset.spieltag = index;
+            option.dataset.team = team;
+            option.textContent = `Spieltag ${index} (${date}): vs. ${team}`;
+            scheduleSelect.appendChild(option);
+            index++;
+        }
+    }
+
+    function applyScheduleSelection() {
+        const scheduleSelect = document.getElementById('scheduleSelect');
+        const selectedOption = scheduleSelect.options[scheduleSelect.selectedIndex];
+        if (!selectedOption.value) return;
+
+        document.getElementById('datum').value = selectedOption.value;
+        document.getElementById('spieltagNummer').value = selectedOption.dataset.spieltag;
+        
+        const opponent = selectedOption.dataset.team;
+        document.getElementById('teamGast').value = opponent;
+    }
 
     function buildMinimalTable() {
         const tbody = document.getElementById('matchTableBody');
@@ -147,7 +205,7 @@
         tbody.appendChild(headerE);
 
         for(let i = 1; i <= 8; i++) {
-            tbody.appendChild(createRow(`Einzel ${i}`, i));
+            tbody.appendChild(createSingleRow(`Einzel ${i}`, i));
         }
 
         // Block 2: Doppel (1 - 4)
@@ -156,20 +214,46 @@
         tbody.appendChild(headerD);
 
         for(let i = 1; i <= 4; i++) {
-            tbody.appendChild(createRow(`Doppel ${i}`, i + 8));
+            tbody.appendChild(createDoubleClickRow(`Doppel ${i}`, i + 8));
         }
     }
 
-    function createRow(label, index) {
+    function createSingleRow(label, index) {
         const tr = document.createElement('tr');
-        
-        let optionsHeim = '<option value="">-- Unser Spieler wählen --</option>';
+        let optionsHeim = '<option value="">-- Spieler --</option>';
         ourTeamRoster.forEach(p => { optionsHeim += `<option value="${p}">${p}</option>`; });
 
         tr.innerHTML = `
             <td><b>${label}</b></td>
             <td><select id="heim_${index}">${optionsHeim}</select></td>
-            <td><input type="text" id="gast_${index}" placeholder="Name des Gegners"></td>
+            <td><input type="text" id="gast_${index}" placeholder="Gegner Spieler"></td>
+        `;
+        return tr;
+    }
+
+    function createDoubleClickRow(label, index) {
+        const tr = document.createElement('tr');
+        let optionsHeim1 = '<option value="">-- Spieler 1 --</option>';
+        let optionsHeim2 = '<option value="">-- Spieler 2 --</option>';
+        ourTeamRoster.forEach(p => { 
+            optionsHeim1 += `<option value="${p}">${p}</option>`;
+            optionsHeim2 += `<option value="${p}">${p}</option>`;
+        });
+
+        tr.innerHTML = `
+            <td><b>${label}</b></td>
+            <td>
+                <div class="double-selects">
+                    <select id="heim_${index}_a">${optionsHeim1}</select>
+                    <select id="heim_${index}_b">${optionsHeim2}</select>
+                </div>
+            </td>
+            <td>
+                <div class="double-selects">
+                    <input type="text" id="gast_${index}_a" placeholder="Gegner 1">
+                    <input type="text" id="gast_${index}_b" placeholder="Gegner 2">
+                </div>
+            </td>
         `;
         return tr;
     }
@@ -178,20 +262,28 @@
         let matchData = [];
         // 8 Einzel + 4 Doppel = 12 Spiele insgesamt
         for(let i = 1; i <= 12; i++) {
-            matchData.push({
-                spiel: i <= 8 ? `Einzel ${i}` : `Doppel ${i-8}`,
-                heim: document.getElementById(`heim_${i}`).value,
-                gast: document.getElementById(`gast_${i}`).value
-            });
+            if (i <= 8) {
+                matchData.push({
+                    spiel: `Einzel ${i}`,
+                    heim: document.getElementById(`heim_${i}`).value,
+                    gast: document.getElementById(`gast_${i}`).value
+                });
+            } else {
+                matchData.push({
+                    spiel: `Doppel ${i-8}`,
+                    heim: `${document.getElementById(`heim_${i}_a`).value} & ${document.getElementById(`heim_${i}_b`).value}`,
+                    gast: `${document.getElementById(`gast_${i}_a`).value} & ${document.getElementById(`gast_${i}_b`).value}`
+                });
+            }
         }
 
         const payloadData = {
             spieltag: document.getElementById('spieltagNummer').value,
-            gegner: document.getElementById('gegnerName').value,
+            datum: document.getElementById('datum').value,
+            gegner: document.getElementById('teamGast').value,
             aufstellung: matchData
         };
 
-        // Übertragung via Image-Hack (GET-Parameter), um jegliche CORS/Redirect-Blockaden zu umgehen
         const url = new URL(GOOGLE_SCRIPT_URL);
         url.searchParams.append("action", "saveNwdvAufstellung");
         url.searchParams.append("spieler", cleanUser);
@@ -201,9 +293,10 @@
         const img = new Image();
         img.src = url.toString();
 
-        alert("Aufstellung für Spieltag " + document.getElementById('spieltagNummer').value + " wurde erfolgreich an das Google Sheet gesendet!");
+        alert("Aufstellung für Spieltag " + document.getElementById('spieltagNummer').value + " erfolgreich gespeichert!");
     }
 
+    populateScheduleSelect();
     buildMinimalTable();
 </script>
 </body>
