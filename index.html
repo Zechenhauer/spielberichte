@@ -9,15 +9,20 @@
     <style>
         :root { --navy: #050a14; --gold: #D4AF37; --text-main: #e2e8f0; }
         body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
-        .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 25px; max-width: 1100px; margin: 0 auto; }
-        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.6rem; margin-bottom: 20px; }
-        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 12px; text-align: center; margin-bottom: 20px; font-size: 1rem; color: var(--gold); font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0c1626; border-radius: 8px; font-size: 0.95rem; }
-        th, td { border: 1px solid rgba(255,255,255,0.1); padding: 15px; text-align: center; }
-        th { background: rgba(255,255,255,0.05); color: var(--gold); font-size: 0.9rem; text-transform: uppercase; }
-        select { width: 100%; padding: 10px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 4px; font-size: 0.9rem; margin: 2px 0; }
-        .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 25px; font-size: 1.1rem; text-transform: uppercase; }
-        .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; }
+        .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 30px; max-width: 1100px; margin: 0 auto; }
+        h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
+        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 15px; text-align: center; margin-bottom: 25px; font-size: 1.1rem; color: var(--gold); font-weight: bold; }
+        
+        /* Große Tabelle */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0c1626; border-radius: 8px; font-size: 1.1rem; }
+        th, td { border: 1px solid rgba(255,255,255,0.1); padding: 18px; text-align: center; }
+        th { background: rgba(255,255,255,0.05); color: var(--gold); font-size: 1rem; text-transform: uppercase; }
+        
+        /* Große Dropdowns */
+        select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; margin: 4px 0; }
+        
+        .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 30px; font-size: 1.2rem; text-transform: uppercase; }
+        .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -25,7 +30,7 @@
     <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zum Dashboard</a>
     <h2>MF Kaderplanung</h2>
     <div class="role-box" id="roleDisplay">Lade...</div>
-    <select id="scheduleSelect" onchange="applySelection()" style="padding:15px; margin-bottom:20px;"></select>
+    <select id="scheduleSelect" onchange="applySelection()" style="padding:15px; margin-bottom:20px; font-size: 1.1rem;"></select>
     
     <table>
         <thead><tr><th>Spiel</th><th>Heim Spieler</th></tr></thead>
@@ -33,20 +38,19 @@
     </table>
     <button class="save-btn" onclick="saveMyAufstellung()">Meine Planung speichern</button>
 
-    <div style="margin-top: 40px; background: rgba(0, 116, 217, 0.05); border: 1px solid #0074D9; padding: 20px; border-radius: 12px;">
-        <h3 style="color:#0074D9; text-align:center; margin-bottom:15px;">Finale Aufstellung</h3>
+    <div style="margin-top: 50px; background: rgba(0, 116, 217, 0.05); border: 1px solid #0074D9; padding: 25px; border-radius: 12px;">
+        <h3 style="color:#0074D9; text-align:center; margin-bottom:20px; font-size: 1.5rem;">Finale Aufstellung</h3>
         <table id="compareTable">
-            <thead><tr><th>Spiel</th><th>Jürg</th><th>Mark</th><th>FINAL</th></tr></thead>
+            <thead><tr><th>Spiel</th><th>Jürgen</th><th>Markus</th><th>FINAL</th></tr></thead>
             <tbody id="compareTableBody"></tbody>
         </table>
-        <div style="margin-top:20px; display:flex; align-items:center; gap:15px;">
-            <input type="checkbox" id="chk-public-visibility" style="transform:scale(1.5);"> 
+        <div style="margin-top:25px; display:flex; align-items:center; gap:20px; font-size: 1.1rem;">
+            <input type="checkbox" id="chk-public-visibility" style="transform:scale(2.0);"> 
             <label for="chk-public-visibility" style="font-weight:bold;">Freigeben (TRUE)</label>
-            <button class="save-btn" style="margin-top:0;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
+            <button class="save-btn" style="margin-top:0; padding:15px 30px;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
         </div>
     </div>
 </div>
-
 <script>
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
@@ -87,7 +91,7 @@
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select>`;
-            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.1)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td style="font-size:0.8rem;">${jV}</td><td style="font-size:0.8rem;">${mV}</td><td>${fin}</td></tr>`;
+            tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
             if(match) {
                 if(i<8) document.getElementById('f'+i).value = jV;
                 else { let p = jV.split(" + "); document.getElementById('f'+i+'a').value = p[0]||""; document.getElementById('f'+i+'b').value = p[1]||""; }
