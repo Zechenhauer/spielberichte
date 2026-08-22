@@ -11,7 +11,7 @@
         body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
         .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 30px; max-width: 1100px; margin: 0 auto; }
         h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
-        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 15px; text-align: center; margin-bottom: 25px; font-size: 1.1rem; color: var(--gold); font-weight: bold; }
+        .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 12px; text-align: center; margin-bottom: 25px; font-size: 1.1rem; color: var(--gold); font-weight: bold; }
         
         /* Große Tabelle */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0c1626; border-radius: 8px; font-size: 1.1rem; }
@@ -20,7 +20,9 @@
         
         /* Große Dropdowns */
         select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; margin: 4px 0; }
-        
+        .double-selects { display: flex; gap: 8px; }
+        .double-selects select { flex: 1; }
+
         .save-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--gold); color: #000; margin-top: 30px; font-size: 1.2rem; text-transform: uppercase; }
         .back-link { display: block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-size: 1rem; }
     </style>
@@ -73,8 +75,11 @@
         let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
         for(let i=1; i<=12; i++) {
             let row = document.createElement('tr');
-            if(i<=8) row.innerHTML = `<td>E${i}</td><td><select id="h${i}"><option value="">--</option>${opts}</select></td>`;
-            else row.innerHTML = `<td>D${i-8}</td><td><select id="h${i}a"><option value="">P1</option>${opts}</select><select id="h${i}b"><option value="">P2</option>${opts}</select></td>`;
+            if(i<=8) {
+                row.innerHTML = `<td>E${i}</td><td><select id="h${i}"><option value="">--</option>${opts}</select></td>`;
+            } else {
+                row.innerHTML = `<td>D${i-8}</td><td><div class="double-selects"><select id="h${i}a"><option value="">Spieler 1</option>${opts}</select><select id="h${i}b"><option value="">Spieler 2</option>${opts}</select></div></td>`;
+            }
             tbody.appendChild(row);
         }
     }
@@ -90,11 +95,18 @@
         const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
-            let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select>`;
+            let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<div class="double-selects"><select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select></div>`;
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
             if(match) {
-                if(i<8) document.getElementById('f'+i).value = jV;
-                else { let p = jV.split(" + "); document.getElementById('f'+i+'a').value = p[0]||""; document.getElementById('f'+i+'b').value = p[1]||""; }
+                if(i<8) {
+                    document.getElementById('f'+i).value = jV;
+                } else { 
+                    let p = jV.split(" + "); 
+                    let sA = document.getElementById('f'+i+'a');
+                    let sB = document.getElementById('f'+i+'b');
+                    if(sA && p[0]) sA.value = p[0].trim(); 
+                    if(sB && p[1]) sB.value = p[1].trim(); 
+                }
             }
         }
     }
@@ -103,8 +115,16 @@
         const my = globalServerData.mfAufstellungen.find(a => a.manager.includes(cleanUser) && a.spieltag == st);
         if(my?.payload?.aufstellung) {
             my.payload.aufstellung.forEach((x, i) => {
-                if(i<8) { let s = document.getElementById('h'+(i+1)); if(s) s.value = x.heim; }
-                else { let p = x.heim.split(" + "); document.getElementById('h'+(i+1)+'a').value = p[0]||""; document.getElementById('h'+(i+1)+'b').value = p[1]||""; }
+                if(i < 8) { 
+                    let s = document.getElementById('h' + (i + 1)); 
+                    if(s) s.value = x.heim; 
+                } else { 
+                    let parts = (x.heim || "").split(" + "); 
+                    let selA = document.getElementById('h' + (i + 1) + 'a');
+                    let selB = document.getElementById('h' + (i + 1) + 'b');
+                    if(selA && parts[0]) selA.value = parts[0].trim(); 
+                    if(selB && parts[1]) selB.value = parts[1].trim(); 
+                }
             });
         }
         renderCompareTable(st);
