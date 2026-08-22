@@ -120,13 +120,17 @@
         const jList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Jürgen") && a.spieltag == st)?.payload?.aufstellung || [];
         const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
         
+        // 1. Schritt: HTML-Struktur der Tabelle aufbauen
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
-            
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<div class="double-selects"><select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select></div>`;
             
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
-            
+        }
+
+        // 2. Schritt: Werte bei Übereinstimmung nachträglich in die Select-Felder eintragen
+        for(let i=0; i<12; i++) {
+            let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             if(match) {
                 if(i < 8) {
                     let sel = document.getElementById('f' + i);
