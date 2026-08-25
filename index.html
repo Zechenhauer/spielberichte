@@ -9,7 +9,7 @@
     <style>
         :root { --navy: #050a14; --gold: #D4AF37; --text-main: #e2e8f0; }
         body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
-        .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 30px; max-width: 1100px; margin: 0 auto; }
+        .container { background-color: var(--navy); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 30px; max-width: 1100px; margin: 0 auto; position: relative; }
         h2 { font-family: 'Poppins', sans-serif; color: var(--gold); text-align: center; font-size: 1.8rem; margin-bottom: 25px; }
         .role-box { background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold); padding: 12px; text-align: center; margin-bottom: 25px; font-size: 1.1rem; color: var(--gold); font-weight: bold; }
         
@@ -30,13 +30,22 @@
         .chat-msg span { font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 3px; }
         .chat-input-row { display: flex; gap: 10px; }
         .chat-input-row input { flex: 1; padding: 14px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; }
+
+        /* Notification Banner Style */
+        #notification-banner { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 25px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; font-size: 1.1rem; }
     </style>
 </head>
 <body>
+<div id="notification-banner"><i class="fa-solid fa-bell"></i> Neue Chat-Nachricht erhalten!</div>
+
 <div class="container">
     <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zum Dashboard</a>
     <h2>MF Kaderplanung</h2>
     <div class="role-box" id="roleDisplay">Lade...</div>
+    <div style="text-align:center; margin-bottom:15px;">
+        <button onclick="requestNotificationPermission()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-bell"></i> PC-Benachrichtigungen aktivieren</button>
+    </div>
+    
     <select id="scheduleSelect" onchange="applySelection()" style="padding:15px; margin-bottom:20px; font-size: 1.1rem;"></select>
     
     <table>
@@ -64,7 +73,7 @@
             <span style="color:#94a3b8; text-align:center;">Lade Nachrichten...</span>
         </div>
         <div class="chat-input-row">
-            <input type="text" id="chatInput" placeholder="Nachricht an Markus / Jürgen schreiben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <input type="text" id="chatInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
             <button class="save-btn" style="width: auto; margin-top: 0; padding: 14px 25px; font-size: 1.1rem;" onclick="sendChatMessage()">Senden</button>
         </div>
     </div>
@@ -76,6 +85,8 @@
     const cleanUser = currentUser.replace(/ \(.*\)/g, '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
     let globalServerData = null;
+    let lastKnownMessageCount = 0;
+
     const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Dominik Helmke", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Florian Hartwich"];
     const schedule = {"2026-09-05":"TV Kapellen 1919 e.V. 2","2026-09-18":"DSC Goch 3","2026-09-25":"Rumelner TV 3","2026-10-10":"DSC Goch 4","2026-10-23":"Triple Inn Issum 2","2026-11-07":"SV Menzelen 1925","2026-11-13":"Die Wardter Darter","2026-11-27":"The Red Lions Xanten 1","2027-01-09":"Hart am Draht","2027-01-22":"TV Kapellen 1919 e.V. 2","2027-02-06":"DSC Goch 3","2027-02-19":"Rumelner TV 3","2027-03-05":"DSC Goch 4","2027-03-13":"Triple Inn Issum 2","2027-04-02":"SV Menzelen 1925","2027-04-24":"Die Wardter Darter","2027-05-08":"The Red Lions Xanten 1","2027-05-14":"Hart am Draht"};
 
@@ -83,6 +94,9 @@
         const select = document.getElementById('scheduleSelect');
         Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}">${i+1}: vs ${team}</option>`);
         loadDataFromServer();
+        
+        // Prüft alle 10 Sekunden im Hintergrund, ob der andere was geschrieben hat
+        setInterval(checkForNewMessagesInBackground, 10000);
     }
     
     function applySelection() { 
@@ -110,7 +124,60 @@
     async function loadDataFromServer() {
         let res = await fetch(GOOGLE_SCRIPT_URL); 
         globalServerData = await res.json();
+        
+        const chats = globalServerData?.chats || [];
+        if (lastKnownMessageCount === 0) {
+            lastKnownMessageCount = chats.length;
+        }
+        
         applySelection();
+    }
+
+    async function checkForNewMessagesInBackground() {
+        try {
+            let res = await fetch(GOOGLE_SCRIPT_URL);
+            let newData = await res.json();
+            let newChats = newData?.chats || [];
+            
+            if (newChats.length > lastKnownMessageCount) {
+                let latestMsg = newChats[newChats.length - 1];
+                
+                if (latestMsg.absender !== cleanUser) {
+                    showNotificationBanner(latestMsg.absender, latestMsg.text);
+                    showBrowserNotification(latestMsg.absender, latestMsg.text);
+                }
+                
+                globalServerData = newData;
+                lastKnownMessageCount = newChats.length;
+                renderChat();
+                renderCompareTable(document.getElementById('scheduleSelect').value);
+            }
+        } catch(e) {}
+    }
+
+    function showNotificationBanner(sender, text) {
+        const banner = document.getElementById('notification-banner');
+        banner.innerHTML = `<i class="fa-solid fa-bell"></i> <b>${sender}:</b> "${text}"`;
+        banner.style.display = 'block';
+        setTimeout(() => { banner.style.display = 'none'; }, 6000);
+    }
+
+    function requestNotificationPermission() {
+        if ("Notification" in window) {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("PC-Benachrichtigungen erfolgreich aktiviert!");
+                }
+            });
+        }
+    }
+
+    function showBrowserNotification(sender, text) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(`Neue Nachricht von ${sender}`, {
+                body: text
+            });
+        }
     }
 
     function renderCompareTable(st) {
@@ -120,7 +187,6 @@
         const jList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Jürgen") && a.spieltag == st)?.payload?.aufstellung || [];
         const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
         
-        // 1. Schritt: HTML-Struktur der Tabelle aufbauen
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             let fin = i<8 ? `<select id="f${i}"><option value="">--</option>${opts}</select>` : `<div class="double-selects"><select id="f${i}a"><option value="">P1</option>${opts}</select><select id="f${i}b"><option value="">P2</option>${opts}</select></div>`;
@@ -128,7 +194,6 @@
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
         }
 
-        // 2. Schritt: Werte bei Übereinstimmung nachträglich in die Select-Felder eintragen
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
             if(match) {
@@ -201,6 +266,7 @@
         chatBox.innerHTML += `<div class="chat-msg"><span><b>${cleanUser}</b> (${timeNow}):</span> ${text}</div>`;
         chatBox.scrollTop = chatBox.scrollHeight;
         
+        lastKnownMessageCount++;
         input.value = '';
         setTimeout(loadDataFromServer, 1500);
     }
