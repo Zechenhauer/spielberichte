@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung</title>
+    <title>TV Kapellen 1919 e.V. 3 - MF Kaderplanung (Supabase Live)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Supabase Client Bibliothek -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --navy: #050a14; --gold: #D4AF37; --text-main: #e2e8f0; }
         body { background-color: #000; color: var(--text-main); font-family: 'Lato', sans-serif; padding: 20px; }
@@ -40,7 +42,7 @@
 
 <div class="container">
     <a href="https://zechenhauer.github.io/TVK-3-Saison-26-27/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Zum Dashboard</a>
-    <h2>MF Kaderplanung</h2>
+    <h2>MF Kaderplanung (Supabase Live)</h2>
     <div class="role-box" id="roleDisplay">Lade...</div>
     <div style="text-align:center; margin-bottom:15px;">
         <button onclick="requestNotificationPermission()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-bell"></i> PC-Benachrichtigungen aktivieren</button>
@@ -63,7 +65,7 @@
         <div style="margin-top:25px; display:flex; align-items:center; gap:20px; font-size: 1.1rem;">
             <input type="checkbox" id="chk-public-visibility" style="transform:scale(2.0);"> 
             <label for="chk-public-visibility" style="font-weight:bold;">Freigeben (TRUE)</label>
-            <button class="save-btn" style="margin-top:0; padding:15px 30px;" onclick="saveFinalAufstellungToSheet()">Speichern & Freigeben</button>
+            <button class="save-btn" style="margin-top:0; padding:15px 30px;" onclick="saveFinalAufstellungToSupabase()">Speichern & Freigeben</button>
         </div>
     </div>
 
@@ -80,22 +82,27 @@
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDn_d9o-RWGVFUENrs3ZubfFHPvo2SSKzy0bY0uw4avjngv9l0zgfVDop5cfcm6AgKHg/exec';
+    const SUPABASE_URL = 'https://lhusylpjnujlqomougmg.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_yXEueWILvAq-Vm2VfTuYyg_BIQeE1KK';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     let currentUser = localStorage.getItem('tvk3_user_26_27_mobile') || "Jürgen Schützendorf";
     const cleanUser = currentUser.replace(/ \(.*\)/g, '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
-    let globalServerData = null;
+    
+    let globalServerData = { anmeldungen: [], mfAufstellungen: [], chats: [] };
     let lastKnownMessageCount = 0;
 
     const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Leon Gerber", "Gregor Marek", "Yannick Steffes", "Florian Hartwich"];
     const schedule = {"2026-09-05":"TV Kapellen 1919 e.V. 2","2026-09-18":"DSC Goch 3","2026-09-25":"Rumelner TV 3","2026-10-10":"DSC Goch 4","2026-10-23":"Triple Inn Issum 2","2026-11-07":"SV Menzelen 1925","2026-11-13":"Die Wardter Darter","2026-11-27":"The Red Lions Xanten 1","2027-01-09":"Hart am Draht","2027-01-22":"TV Kapellen 1919 e.V. 2","2027-02-06":"DSC Goch 3","2027-02-19":"Rumelner TV 3","2027-03-05":"DSC Goch 4","2027-03-13":"Triple Inn Issum 2","2027-04-02":"SV Menzelen 1925","2027-04-24":"Die Wardter Darter","2027-05-08":"The Red Lions Xanten 1","2027-05-14":"Hart am Draht"};
 
-    function init() {
+    async function init() {
         const select = document.getElementById('scheduleSelect');
-        Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}">${i+1}: vs ${team}</option>`);
-        loadDataFromServer();
+        select.innerHTML = '';
+        Object.entries(schedule).forEach(([date, team], i) => select.innerHTML += `<option value="${i+1}">${i+1}: vs ${team} (${date})</option>`);
         
-        // Prüft alle 10 Sekunden im Hintergrund, ob der andere was geschrieben hat
+        await loadDataFromSupabase();
+        
         setInterval(checkForNewMessagesInBackground, 10000);
     }
     
@@ -105,9 +112,15 @@
         renderChat(); 
     }
 
+    function getAbsagenForCurrentSpieltag() {
+        const st = parseInt(document.getElementById('scheduleSelect').value);
+        return globalServerData.anmeldungen
+            .filter(a => a.spieltag_id === st && (a.status === 'no' || a.status === 'nein' || a.status === false))
+            .map(a => a.spieler);
+    }
+
     function buildTable() {
-        const st = document.getElementById('scheduleSelect').value;
-        const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
+        const abs = getAbsagenForCurrentSpieltag();
         const tbody = document.getElementById('matchTableBody'); tbody.innerHTML = '';
         let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
         for(let i=1; i<=12; i++) {
@@ -121,23 +134,33 @@
         }
     }
 
-    async function loadDataFromServer() {
-        let res = await fetch(GOOGLE_SCRIPT_URL); 
-        globalServerData = await res.json();
-        
-        const chats = globalServerData?.chats || [];
-        if (lastKnownMessageCount === 0) {
-            lastKnownMessageCount = chats.length;
+    async function loadDataFromSupabase() {
+        try {
+            let { data: anmeldungenData } = await supabaseClient.from('tvk_basis_anmeldungen').select('*');
+            let { data: aufstellungenData } = await supabaseClient.from('kader_aufstellungen').select('*');
+            let { data: chatData } = await supabaseClient.from('kader_chat').select('*').order('created_at', { ascending: true });
+
+            globalServerData = {
+                anmeldungen: anmeldungenData || [],
+                mfAufstellungen: aufstellungenData || [],
+                chats: chatData || []
+            };
+
+            const chats = globalServerData.chats;
+            if (lastKnownMessageCount === 0) {
+                lastKnownMessageCount = chats.length;
+            }
+
+            applySelection();
+        } catch (e) {
+            console.error("Fehler beim Laden aus Supabase:", e);
         }
-        
-        applySelection();
     }
 
     async function checkForNewMessagesInBackground() {
         try {
-            let res = await fetch(GOOGLE_SCRIPT_URL);
-            let newData = await res.json();
-            let newChats = newData?.chats || [];
+            let { data: chatData } = await supabaseClient.from('kader_chat').select('*').order('created_at', { ascending: true });
+            let newChats = chatData || [];
             
             if (newChats.length > lastKnownMessageCount) {
                 let latestMsg = newChats[newChats.length - 1];
@@ -147,11 +170,18 @@
                     showBrowserNotification(latestMsg.absender, latestMsg.text);
                 }
                 
-                globalServerData = newData;
+                globalServerData.chats = newChats;
                 lastKnownMessageCount = newChats.length;
                 renderChat();
-                renderCompareTable(document.getElementById('scheduleSelect').value);
             }
+
+            let { data: aufstellungenData } = await supabaseClient.from('kader_aufstellungen').select('*');
+            let { data: anmeldungenData } = await supabaseClient.from('tvk_basis_anmeldungen').select('*');
+            
+            globalServerData.mfAufstellungen = aufstellungenData || [];
+            globalServerData.anmeldungen = anmeldungenData || [];
+            
+            renderCompareTable(document.getElementById('scheduleSelect').value);
         } catch(e) {}
     }
 
@@ -181,11 +211,17 @@
     }
 
     function renderCompareTable(st) {
+        st = parseInt(st);
         const tbody = document.getElementById('compareTableBody'); tbody.innerHTML = '';
-        const abs = globalServerData?.spieltage?.find(x => x.id == st)?.absagen || [];
+        const abs = getAbsagenForCurrentSpieltag();
         let opts = ourTeamRoster.filter(p => !abs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
-        const jList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Jürgen") && a.spieltag == st)?.payload?.aufstellung || [];
-        const mList = globalServerData.mfAufstellungen.find(a => a.manager.includes("Markus") && a.spieltag == st)?.payload?.aufstellung || [];
+        
+        const jEntry = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("jürgen") && a.spieltag_id == st);
+        const mEntry = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes("markus") && a.spieltag_id == st);
+        const fEntry = globalServerData.mfAufstellungen.find(a => a.manager === "FINAL" && a.spieltag_id == st);
+
+        const jList = jEntry?.aufstellung || [];
+        const mList = mEntry?.aufstellung || [];
         
         for(let i=0; i<12; i++) {
             let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
@@ -194,28 +230,46 @@
             tbody.innerHTML += `<tr style="${match ? 'background:rgba(16,185,129,0.2)' : ''}"><td>${i<8?'E'+(i+1):'D'+(i-7)}</td><td>${jV}</td><td>${mV}</td><td>${fin}</td></tr>`;
         }
 
-        for(let i=0; i<12; i++) {
-            let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
-            if(match) {
+        if (fEntry) {
+            document.getElementById('chk-public-visibility').checked = fEntry.freigegeben || false;
+            const fList = fEntry.aufstellung || [];
+            for(let i=0; i<12; i++) {
+                let val = fList[i]?.heim || "";
                 if(i < 8) {
                     let sel = document.getElementById('f' + i);
-                    if(sel) sel.value = jV;
-                } else { 
-                    let p = jV.split(" + "); 
+                    if(sel) sel.value = val;
+                } else {
+                    let p = val.split(" + ");
                     let sA = document.getElementById('f' + i + 'a');
                     let sB = document.getElementById('f' + i + 'b');
-                    if(sA && p[0]) sA.value = p[0].trim(); 
-                    if(sB && p[1]) sB.value = p[1].trim(); 
+                    if(sA && p[0]) sA.value = p[0].trim();
+                    if(sB && p[1]) sB.value = p[1].trim();
+                }
+            }
+        } else {
+            for(let i=0; i<12; i++) {
+                let jV = jList[i]?.heim || "", mV = mList[i]?.heim || "", match = (jV && mV && jV === mV);
+                if(match) {
+                    if(i < 8) {
+                        let sel = document.getElementById('f' + i);
+                        if(sel) sel.value = jV;
+                    } else { 
+                        let p = jV.split(" + "); 
+                        let sA = document.getElementById('f' + i + 'a');
+                        let sB = document.getElementById('f' + i + 'b');
+                        if(sA && p[0]) sA.value = p[0].trim(); 
+                        if(sB && p[1]) sB.value = p[1].trim(); 
+                    }
                 }
             }
         }
     }
 
     function loadExisting() {
-        const st = document.getElementById('scheduleSelect').value;
-        const my = globalServerData.mfAufstellungen.find(a => a.manager.includes(cleanUser) && a.spieltag == st);
-        if(my?.payload?.aufstellung) {
-            my.payload.aufstellung.forEach((x, i) => {
+        const st = parseInt(document.getElementById('scheduleSelect').value);
+        const my = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes(cleanUser.toLowerCase()) && a.spieltag_id == st);
+        if(my?.aufstellung) {
+            my.aufstellung.forEach((x, i) => {
                 let indexNum = i + 1;
                 if(indexNum <= 8) { 
                     let s = document.getElementById('h' + indexNum); 
@@ -248,51 +302,125 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function sendChatMessage() {
+    async function sendChatMessage() {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if(!text) return;
 
-        const url = new URL(GOOGLE_SCRIPT_URL);
-        url.searchParams.append("action", "saveChat");
-        url.searchParams.append("spieler", cleanUser);
-        url.searchParams.append("text", text);
-        
-        new Image().src = url.toString();
-        
-        const chatBox = document.getElementById('chatContainer');
-        if(chatBox.innerHTML.includes("Noch keine Nachrichten")) chatBox.innerHTML = '';
         const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        chatBox.innerHTML += `<div class="chat-msg"><span><b>${cleanUser}</b> (${timeNow}):</span> ${text}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        
-        lastKnownMessageCount++;
+
+        let { error } = await supabaseClient.from('kader_chat').insert([{
+            absender: cleanUser,
+            text: text,
+            zeit: timeNow
+        }]);
+
+        if (error) {
+            alert("Fehler beim Senden: " + error.message);
+            return;
+        }
+
         input.value = '';
-        setTimeout(loadDataFromServer, 1500);
+        await loadDataFromSupabase();
     }
 
-    function saveMyAufstellung() {
+    async function saveMyAufstellung() {
         let list = [];
         for(let i=1; i<=12; i++) {
             let val = i<=8 ? document.getElementById('h'+i).value : document.getElementById('h'+i+'a').value + ' + ' + document.getElementById('h'+i+'b').value;
             list.push({spiel: i<=8?'E'+i:'D'+(i-8), heim: val});
         }
-        const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveNwdvAufstellung");
-        url.searchParams.append("spieler", cleanUser); url.searchParams.append("spieltag", document.getElementById('scheduleSelect').value);
-        url.searchParams.append("payload", JSON.stringify({aufstellung: list}));
-        new Image().src = url.toString(); alert("Planung gespeichert!"); setTimeout(loadDataFromServer, 1000);
+        
+        const st = parseInt(document.getElementById('scheduleSelect').value);
+        let existing = globalServerData.mfAufstellungen.find(a => a.manager.toLowerCase().includes(cleanUser.toLowerCase()) && a.spieltag_id == st);
+
+        let { error } = await supabaseClient.from('kader_aufstellungen').upsert({
+            id: existing ? existing.id : undefined,
+            spieltag_id: st,
+            manager: cleanUser,
+            aufstellung: list,
+            freigegeben: existing ? existing.freigegeben : false
+        });
+
+        if(error) {
+            alert("Fehler beim Speichern: " + error.message);
+            return;
+        }
+
+        alert("Planung erfolgreich in Supabase gespeichert!");
+        await loadDataFromSupabase();
     }
 
-    function saveFinalAufstellungToSheet() {
-        const st = document.getElementById('scheduleSelect').value, rolle = cleanUser.includes("Jürgen") ? "MF1" : "MF2";
-        let e1 = [], d = [];
-        for(let i=0; i<8; i++) { let v = document.getElementById('f'+i).value; if(v) e1.push(v + " (E"+(i+1)+")"); }
-        for(let i=8; i<12; i++) { let sA = document.getElementById('f'+i+'a'), sB = document.getElementById('f'+i+'b'); if(sA.value && sB.value) d.push(sA.value + " + " + sB.value + " (D"+(i-7)+")"); }
-        const url = new URL(GOOGLE_SCRIPT_URL); url.searchParams.append("action", "saveAufstellung");
-        url.searchParams.append("id", st); url.searchParams.append("rolle", rolle);
-        url.searchParams.append("einzel1", e1.join(", ")); url.searchParams.append("doppel", d.join(", "));
-        url.searchParams.append("freigegeben", document.getElementById('chk-public-visibility').checked);
-        new Image().src = url.toString(); alert("Final gespeichert!"); setTimeout(loadDataFromServer, 1000);
+    async function saveFinalAufstellungToSupabase() {
+        const st = parseInt(document.getElementById('scheduleSelect').value);
+        let list = [];
+
+        for(let i=0; i<8; i++) { 
+            let v = document.getElementById('f'+i).value; 
+            list.push({spiel: 'E'+(i+1), heim: v});
+        }
+        for(let i=8; i<12; i++) { 
+            let sA = document.getElementById('f'+i+'a'), sB = document.getElementById('f'+i+'b'); 
+            let pairVal = (sA.value && sB.value) ? sA.value + " + " + sB.value : "";
+            list.push({spiel: 'D'+(i-7), heim: pairVal});
+        }
+
+        const isFreigegeben = document.getElementById('chk-public-visibility').checked;
+        let existingFinal = globalServerData.mfAufstellungen.find(a => a.manager === "FINAL" && a.spieltag_id == st);
+
+        let { error: errFinal } = await supabaseClient.from('kader_aufstellungen').upsert({
+            id: existingFinal ? existingFinal.id : undefined,
+            spieltag_id: st,
+            manager: "FINAL",
+            aufstellung: list,
+            freigegeben: isFreigegeben
+        });
+
+        if(errFinal) {
+            alert("Fehler beim Speichern der Finalen Aufstellung: " + errFinal.message);
+            return;
+        }
+
+        // Direkt in die echte Haupt-App Tabelle 'tvk_basis_spiel_details' übertragen!
+        let detailRows = [];
+        
+        // Einzel (E1 bis E8)
+        for(let i=0; i<8; i++) {
+            let spielerName = document.getElementById('f'+i).value;
+            detailRows.push({
+                spieltag_id: st,
+                kategorie: "Einzel",
+                spiel_nummer: i + 1,
+                spieler_1: spielerName || null,
+                spieler_2: null,
+                gewonnen: true
+            });
+        }
+
+        // Doppel (D1 bis D4)
+        for(let i=8; i<12; i++) {
+            let sA = document.getElementById('f'+i+'a').value;
+            let sB = document.getElementById('f'+i+'b').value;
+            detailRows.push({
+                spieltag_id: st,
+                kategorie: "Doppel",
+                spiel_nummer: i - 7,
+                spieler_1: sA || null,
+                spieler_2: sB || null,
+                gewonnen: true
+            });
+        }
+
+        await supabaseClient.from('tvk_basis_spiel_details').delete().eq('spieltag_id', st);
+        let { error: errDetails } = await supabaseClient.from('tvk_basis_spiel_details').insert(detailRows);
+
+        if(errDetails) {
+            alert("Aufstellung gespeichert, aber Fehler beim Übertragen in tvk_basis_spiel_details: " + errDetails.message);
+            return;
+        }
+
+        alert("Finale Aufstellung erfolgreich gespeichert & an die Haupt-App (tvk_basis_spiel_details) übergeben!");
+        await loadDataFromSupabase();
     }
 
     init();
