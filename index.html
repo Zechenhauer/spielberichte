@@ -33,6 +33,27 @@
         .chat-input-row { display: flex; gap: 10px; }
         .chat-input-row input { flex: 1; padding: 14px; background: #000; color: #fff; border: 1px solid var(--gold); border-radius: 6px; font-size: 1.1rem; }
 
+        /* Stats Section */
+        .stats-section { margin-top: 50px; background: rgba(212, 175, 55, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); padding: 25px; border-radius: 12px; }
+        .stats-table th, .stats-table td { padding: 12px; font-size: 0.95rem; text-align: center; }
+        .stats-table th:first-child, .stats-table td:first-child { text-align: left; }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        .stat-badge-total {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .stat-empty { color: #475569; }
+
         /* Notification Banner Style */
         #notification-banner { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 25px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; font-size: 1.1rem; }
     </style>
@@ -69,6 +90,23 @@
         </div>
     </div>
 
+    <!-- EINZEL-STATISTIK SEKTION -->
+    <div class="stats-section">
+        <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size: 1.5rem;"><i class="fa-solid fa-chart-bar"></i> Saison-Statistik (Einzel-Einsätze)</h3>
+        
+        <div style="overflow-x:auto;">
+            <table class="stats-table" id="singleStatsTable">
+                <thead>
+                    <tr><th>Spieler</th><th>E1</th><th>E2</th><th>E3</th><th>E4</th><th>E5</th><th>E6</th><th>E7</th><th>E8</th><th>Gesamt</th></tr>
+                </thead>
+                <tbody id="singleStatsBody">
+                    <tr><td colspan="10" style="text-align:center; color:#94a3b8;">Lade Statistik...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- ENDE STATISTIK SEKTION -->
+
     <div class="chat-section">
         <h3 style="color:var(--gold); text-align:center; margin-bottom:20px; font-size: 1.5rem;"><i class="fa-solid fa-comments"></i> MF Absprache-Chat</h3>
         <div class="chat-box" id="chatContainer">
@@ -90,7 +128,7 @@
     const cleanUser = currentUser.replace(/ \(.*\)/g, '').trim();
     document.getElementById('roleDisplay').innerHTML = `Eingeloggt als: <b>${cleanUser}</b>`;
     
-    let globalServerData = { anmeldungen: [], mfAufstellungen: [], chats: [] };
+    let globalServerData = { anmeldungen: [], mfAufstellungen: [], chats: [], allDetails: [] };
     let lastKnownMessageCount = 0;
 
     const ourTeamRoster = ["Jürgen Schützendorf", "Markus Ginsel", "Lars Neutag", "Ludger Schledorn", "Andreas Denner", "Niklas Weichert", "Markus Lenz", "Thomas Kliver", "Wolfram Senger", "Michael Müller", "Leon Gerber", "Gregor Marek", "Yannick Steffes", "Florian Hartwich"];
@@ -110,6 +148,7 @@
         buildTable(); 
         loadExisting(); 
         renderChat(); 
+        renderStats();
     }
 
     function getAbsagenForCurrentSpieltag() {
@@ -139,11 +178,13 @@
             let { data: anmeldungenData } = await supabaseClient.from('tvk_basis_anmeldungen').select('*');
             let { data: aufstellungenData } = await supabaseClient.from('kader_aufstellungen').select('*');
             let { data: chatData } = await supabaseClient.from('kader_chat').select('*').order('created_at', { ascending: true });
+            let { data: detailsData } = await supabaseClient.from('tvk_basis_spiel_details').select('*');
 
             globalServerData = {
                 anmeldungen: anmeldungenData || [],
                 mfAufstellungen: aufstellungenData || [],
-                chats: chatData || []
+                chats: chatData || [],
+                allDetails: detailsData || []
             };
 
             const chats = globalServerData.chats;
@@ -177,11 +218,14 @@
 
             let { data: aufstellungenData } = await supabaseClient.from('kader_aufstellungen').select('*');
             let { data: anmeldungenData } = await supabaseClient.from('tvk_basis_anmeldungen').select('*');
+            let { data: detailsData } = await supabaseClient.from('tvk_basis_spiel_details').select('*');
             
             globalServerData.mfAufstellungen = aufstellungenData || [];
             globalServerData.anmeldungen = anmeldungenData || [];
+            globalServerData.allDetails = detailsData || [];
             
             renderCompareTable(document.getElementById('scheduleSelect').value);
+            renderStats();
         } catch(e) {}
     }
 
@@ -262,6 +306,67 @@
                     }
                 }
             }
+        }
+    }
+
+    function fmtVal(val) {
+        if (!val || val === 0 || val === '-') return '<span class="stat-empty">-</span>';
+        return `<span class="stat-badge">${val}</span>`;
+    }
+
+    function fmtTotal(val) {
+        if (!val || val === 0 || val === '-') return '<span class="stat-empty">-</span>';
+        return `<span class="stat-badge stat-badge-total">${val}</span>`;
+    }
+
+    function renderStats() {
+        const details = globalServerData.allDetails || [];
+        let singleStats = {}; 
+
+        ourTeamRoster.forEach(p => {
+            singleStats[p] = { E1:0, E2:0, E3:0, E4:0, E5:0, E6:0, E7:0, E8:0, total:0 };
+        });
+
+        details.forEach(row => {
+            if (row.kategorie === "Einzel" && row.spieler_1) {
+                let p = row.spieler_1;
+                let pos = "E" + row.spiel_nummer;
+                if (!singleStats[p]) {
+                    singleStats[p] = { E1:0, E2:0, E3:0, E4:0, E5:0, E6:0, E7:0, E8:0, total:0 };
+                }
+                if (singleStats[p][pos] !== undefined) {
+                    singleStats[p][pos]++;
+                    singleStats[p].total++;
+                }
+            }
+        });
+
+        const singleBody = document.getElementById('singleStatsBody');
+        singleBody.innerHTML = '';
+        
+        let sortedSingles = Object.entries(singleStats).sort((a, b) => b[1].total - a[1].total);
+
+        sortedSingles.forEach(([player, counts]) => {
+            if (counts.total > 0) {
+                singleBody.innerHTML += `
+                    <tr>
+                        <td style="text-align:left;"><b>${player}</b></td>
+                        <td>${fmtVal(counts.E1)}</td>
+                        <td>${fmtVal(counts.E2)}</td>
+                        <td>${fmtVal(counts.E3)}</td>
+                        <td>${fmtVal(counts.E4)}</td>
+                        <td>${fmtVal(counts.E5)}</td>
+                        <td>${fmtVal(counts.E6)}</td>
+                        <td>${fmtVal(counts.E7)}</td>
+                        <td>${fmtVal(counts.E8)}</td>
+                        <td>${fmtTotal(counts.total)}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        if (singleBody.innerHTML === '') {
+            singleBody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#94a3b8;">Noch keine Einzel-Einsätze in freigegebenen Spielen vorhanden.</td></tr>`;
         }
     }
 
@@ -381,10 +486,7 @@
             return;
         }
 
-        // Direkt in die echte Haupt-App Tabelle 'tvk_basis_spiel_details' übertragen!
         let detailRows = [];
-        
-        // Einzel (E1 bis E8)
         for(let i=0; i<8; i++) {
             let spielerName = document.getElementById('f'+i).value;
             detailRows.push({
@@ -397,7 +499,6 @@
             });
         }
 
-        // Doppel (D1 bis D4)
         for(let i=8; i<12; i++) {
             let sA = document.getElementById('f'+i+'a').value;
             let sB = document.getElementById('f'+i+'b').value;
